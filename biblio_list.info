@@ -1,0 +1,4 @@
+name = biblio_list
+description = 'Цитирование статей: xml'
+core = 7.x
+package = Other
