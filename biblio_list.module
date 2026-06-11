@@ -140,29 +140,20 @@ function mybiblio_list_block_content() {
 
 
 	  			for($j=0; $j<count($FIO_autor_text); $j++){
-
-
 	  				$authors = $authors . '
     <author>
       <name>' . $FIO_autor_text[$j] . '</name>
       <affiliationId>' . $affiliationId[$j] . '</affiliationId>
     </author>';
 	  			}
-
-
 	  		$authors = $authors . '
   </authors>';
-
-
   			$authors = $authors . '
   <affiliationsList>';
-
   		for ($i = 0; $i < count($Company_list); $i++) {
   	$authors = $authors . '
     <affiliationName affiliationId="' . ($i+1) . '">'.company_name($Company_list[$i],$my_language).'</affiliationName>';  			
   		}
-
-
   			$authors = $authors . '
     </affiliationsList>';
 	  } else {
@@ -170,50 +161,18 @@ function mybiblio_list_block_content() {
 	  }
 
 	  if (!empty($node_xml->body['en'][0]['value'])) {
-
-	  	
-
 	  	$abstract_preobraz = strip_tags($node_xml->body['en'][0]['value']);
-
 	  	$abstract = '';
-
-	  	//dpm($abstract_preobraz);
-
-
-/*
-		$simbol1='<valid attribute=">"/>';
-		$simbol2='<valid attribute=">' . '"' . '/>';
-		$simbol3='<valid attribute="'. "'" .'"/>';
-		$simbol4='<valid attribute=">"/>';
-		$simbol5='<valid attribute="&"/>';
-
-		$phrase  = $abstract_preobraz;
-		$healthy = array("&lt;", "&quot;", "&apos;","&gt;","&amp;");
-		$yummy   = array($simbol1, $simbol2, $simbol3,$simbol4,$simbol5);
-		$newphrase = str_replace($healthy, $yummy, $phrase);		
-		$abstract= str_replace("\r\n","",$newphrase);
-*/
 		$abstract = mybiblio_list_shielding_special_characters(htmlspecialchars($abstract_preobraz));
-
-		//dpm(shielding_special_characters(htmlspecialchars($abstract_preobraz)));
-
-
 	  } else{ $abstract = '';}
 
 	if (!empty($node_xml->field_text_pdf['und'][0]['uri'])) {
 		$fullTextUrl= file_create_url($node_xml->field_text_pdf['und'][0]['uri']);
 	} else{ $fullTextUrl = '';}
-  
-
-
 		$keywords='';
 		$BibTeX_keywords='';
-		
 	  if (!empty($node_xml->field_key_words[$my_language][0]['tid'])) {
-
 	  	$keywords = '<keywords language="eng">';
-	  	
-
 	  	for ($i = 0; $i < count($node_xml->field_key_words[$my_language]); $i++) {
 
 	  		$term = taxonomy_term_load($node_xml->field_key_words[$my_language][$i]['tid']);
@@ -222,15 +181,10 @@ function mybiblio_list_block_content() {
     <keyword>' . $name_keywords . '</keyword>';
 
     		if ($i==0){$BibTeX_keywords=$name_keywords;}else{$BibTeX_keywords= $BibTeX_keywords .','. $name_keywords;}
-    		
-
 	  	}
-
 	  	$keywords = $keywords . '
   </keywords>';
-
 	  }
-
 	$rezultXML ='<?xml version="1.0" encoding="UTF-8"?>
 <records>
  <record>
@@ -260,8 +214,6 @@ function mybiblio_list_block_content() {
 
 /*---------------- BibTeX --------------*/
 
- //dpm($node_xml->field_author_link);
-
 	$BibTeX_autor = '';
 
 	for($j=0; $j<count($FIO_autor_text); $j++){
@@ -281,19 +233,7 @@ function mybiblio_list_block_content() {
 			}
 	}
 
-	//$BibTeX_address = company_name('3712',$my_language);
-
 	$BibTeX_address ="Saratov State University, ul. Astrakhanskaya, 83, Saratov, 410012, Russia";
-
-/*
-	for($i=0; $i<count($Company_autor_id); $i++){
-		if ($i==0){ 
-			$BibTeX_Company_autor = company_name($Company_autor_id[$i],$my_language);
-		} else{
-			$BibTeX_Company_autor = $BibTeX_Company_autor . ' and ' . company_name($Company_autor_id[$i],$my_language);
-		}
-	}
-*/
 
 	$BibTeX_id_name=variable_get("BibTeX_id_name", "");
 
@@ -315,11 +255,14 @@ function mybiblio_list_block_content() {
 	abstract = {'.$abstract.'}
 }';
 
-	//dpm($rexultBibTeX);
-
-
-
 /*---------------- End BibTeX ----------*/
+
+
+/*------------------ JATS -------------*/
+
+// $rexult_JATS =
+
+/*---------------- End JATS ----------*/
 
   drupal_add_js(drupal_get_path('module', 'biblio_list') . '/js/biblio_list.js');
   drupal_add_css(drupal_get_path('module', 'biblio_list') . '/css/biblio_list.css');
@@ -341,7 +284,14 @@ function mybiblio_list_block_content() {
 	      var blob = new Blob([save], {type: "text/plain;charset=utf-8"});
 	      var mainName = document.getElementsByClassName("page-title")[0].innerHTML;
 	      saveAs(blob, mainName + ".bib");
-	    }	    
+	    }
+
+	    function downloadJATS(){
+	      var save = document.getElementById("JATS").value;  
+	      var blob = new Blob([save], {type: "text/plain;charset=utf-8"});
+	      var mainName = document.getElementsByClassName("page-title")[0].innerHTML;
+	      saveAs(blob, mainName + ".xml");
+	    }
 	', array(
 	  'type' => 'inline',
 	  'scope' => 'footer',
@@ -372,6 +322,7 @@ function mybiblio_list_block_content() {
 				  <div class="nav nav-tabs" id="nav-tab" role="tablist">
 				    <a class="nav-item nav-link active" id="nav-xml-tab" data-toggle="tab" href="#nav-xml" role="tab" aria-controls="nav-xml" aria-selected="true">DOAJ</a>
 				    <a class="nav-item nav-link" id="nav-BibTeX-tab" data-toggle="tab" href="#nav-BibTeX" role="tab" aria-controls="nav-BibTeX" aria-selected="false">BibTeX</a>
+				    <a class="nav-item nav-link" id="nav-JATS-tab" data-toggle="tab" href="#nav-JATS" role="tab" aria-controls="nav-JATS" aria-selected="false">JATS</a>
 				  </div>
 				</nav>
 				<div class="tab-content" id="nav-tabContent">
@@ -393,6 +344,14 @@ function mybiblio_list_block_content() {
 
 				  </div>
 
+				  <div class="tab-pane fade" id="nav-JATS" role="tabpanel" aria-labelledby="nav-JATS-tab">
+					<p class="text-right my-3">JATS</p>
+				    <textarea id="JATS">в разработке</textarea>
+				    <div class="text-right mt-3">
+				    	<button id="button_jats" onclick="downloadJATS();">save as JATS</button>
+				    </div>
+				  </div>
+
 				  </div>				  
 				
 		      </div>
@@ -406,9 +365,7 @@ function mybiblio_list_block_content() {
 
 
 function FIO_autor_node($user_uid,$my_language){
-
 	$info_autor =  user_load($user_uid);
-
 	if ($my_language == 'ru') { $other_language = 'en';} else { $other_language = 'ru';}
 
 		if (isset($info_autor->field_lastname[$my_language]['0']['value'])){
@@ -438,44 +395,26 @@ function FIO_autor_node($user_uid,$my_language){
 				$Otchestvo_autor=$info_autor->field_middle_name['en']['0']['value'];
 			}	
 		}
-
 		$FIO = $field_lastname . ', ' . $Name_autor . ' ' . $Otchestvo_autor;
-
-
-	
-	
 	return $FIO;		
-
-
-		
-
 }
 
 function company_autor_node_id($company_uid,$my_language){
 	$info_autor =  user_load($company_uid);
-
-
 	if (!empty($info_autor->field_company_link['und'])){
 		return $info_autor->field_company_link['und'][0]['target_id'];
 	} 
-
 }
 
 function company_name($node_uid,$my_language){
 
 	$node_company_name = node_load($node_uid);
-	//return $node_company_name->title_field[$my_language][0]['value'] . ', ' . $node_company_name->field_address[$my_language][0]['value'];
-
 	if (!empty($node_company_name->title_field[$my_language][0]['value'])){
 		return $node_company_name->title_field[$my_language][0]['value'] . ', ' . $node_company_name->field_address[$my_language][0]['value'];
 	} 
-
-
-
 }
 
 function  mybiblio_list_shielding_special_characters($text){
-	
 		$text2 = strip_tags($text);
 		$text2=preg_replace('/&(?!#?[a-z0-9]+;)/', '&amp;', $text2);
 
@@ -483,21 +422,10 @@ function  mybiblio_list_shielding_special_characters($text){
 		$simbol2="&quot;";
 		$simbol3="&gt;";
 		$simbol4="&amp;";
-		//$simbol5="&amp;";
 
 		$healthy = array("<",'"', ">","&");
 		$yummy   = array($simbol1, $simbol2, $simbol3,$simbol4);
-
 		$text2 = str_replace($healthy, $yummy, $text2);	
-
-
 		$text_rezult = str_replace(array("\r\n", "\r", "\n"), ' ', $text2);
-
-
-
 		return $text_rezult;		
 }
-
-
-
-?>
