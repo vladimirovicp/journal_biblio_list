@@ -1,0 +1,26 @@
+<article xmlns:xlink="http://www.w3.org/1999/xlink" article-type="research-article" dtd-version="1.4" xml:lang="en">
+    <front>
+        <journal-meta>
+            <journal-title-group>
+                <journal-title xml:lang="ru">  $journalTitleRu  </journal-title>
+            </journal-title-group>
+            <journal-id journal-id-type="issn"> $issnPrint </journal-id>
+            <journal-id journal-id-type="eissn"> $issnOnline </journal-id>
+        </journal-meta>
+        <article-meta>
+            <article-id pub-id-type="doi"> $doi </article-id>
+            <article-id pub-id-type="edn"> $edn </article-id>
+            <article-id pub-id-type="uri"> $alias </article-id>
+            <self-uri> $alias </self-uri>
+            <title-group>
+                <article-title xml:lang="ru">$TitlePageRu</article-title>
+                <trans-title-group xml:lang="en">
+                    <trans-title>$TitlePage</trans-title>
+                </trans-title-group>
+            </title-group>
+            <contrib-group>
+			</contrib-group>
+        </article-meta>
+    </front>
+</article>
+			

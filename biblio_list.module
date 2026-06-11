@@ -46,9 +46,16 @@ function mybiblio_list_block_content() {
 				
 		}
 
-  $journalTitle = variable_get("namesite_citation_en_en", "");
-  $issnPrint = variable_get("issnPrint_citation", "");
-  $issnOnline = variable_get("issnOnline_citation", "");
+	// Получить только алиас (человекопонятный URL без домена и слэша, например: my-alias)
+	$alias = drupal_get_path_alias('node/' . $nid);
+	$absolute_url = url('node/' . $nid, array('absolute' => TRUE));
+
+	$journalTitle = variable_get("namesite_citation_en_en", "");
+	$journalTitleRu = variable_get("namesite_citation_ru_ru", "");
+	$issnPrint = variable_get("issnPrint_citation", "");
+	$issnOnline = variable_get("issnOnline_citation", "");
+
+//   edn
 
 
 /*---------------- XML --------------*/
@@ -57,6 +64,10 @@ function mybiblio_list_block_content() {
   	$TitlePage = $node_xml->title_field['en'][0]['value'];
   } else{ $TitlePage = '';}
 
+	$TitlePageRu = '';
+	if (!empty($node_xml->title_field['ru'][0]['value'])) {
+		$TitlePageRu = $node_xml->title_field['ru'][0]['value'];
+	}
 
 	if(!empty($node_xml->field_journal_link['und'][0]['target_id'])){
 
@@ -97,6 +108,15 @@ function mybiblio_list_block_content() {
 	  if (!empty($node_xml->field_doi['und'][0]['value'])) {
 	  	$doi= $node_xml->field_doi['und'][0]['value'];
 	  } else{ $doi = '';}
+
+	//   edn
+	$edn="";
+	if (!empty($node_xml->field_edn['und'][0]['value'])) {
+		$edn= $node_xml->field_edn['und'][0]['value'];
+	} 
+	
+
+
 
 
 	  $my_language ='en';
@@ -260,7 +280,32 @@ function mybiblio_list_block_content() {
 
 /*------------------ JATS -------------*/
 
-// $rexult_JATS =
+$rexult_JATS = '<?xml version="1.0" encoding="UTF-8"?>
+<article xmlns:xlink="http://www.w3.org/1999/xlink" article-type="research-article" dtd-version="1.4" xml:lang="en">
+    <front>
+        <journal-meta>
+            <journal-title-group>
+                <journal-title xml:lang="ru">  '.$journalTitleRu.'  </journal-title>
+            </journal-title-group>
+            <journal-id journal-id-type="issn"> '.$issnPrint.' </journal-id>
+            <journal-id journal-id-type="eissn"> '.$issnOnline.' </journal-id>
+        </journal-meta>
+        <article-meta>
+            <article-id pub-id-type="doi"> '.$doi.' </article-id>
+            <article-id pub-id-type="edn"> '.$edn.' </article-id>
+            <article-id pub-id-type="uri"> '.$absolute_url.' </article-id>
+            <self-uri> '.$absolute_url.' </self-uri>
+            <title-group>
+                <article-title xml:lang="ru">'.$TitlePageRu.'</article-title>
+                <trans-title-group xml:lang="en">
+                    <trans-title>'.$TitlePage.'</trans-title>
+                </trans-title-group>
+            </title-group>
+            <contrib-group>
+			</contrib-group>
+        </article-meta>
+    </front>
+</article>';
 
 /*---------------- End JATS ----------*/
 
@@ -346,7 +391,7 @@ function mybiblio_list_block_content() {
 
 				  <div class="tab-pane fade" id="nav-JATS" role="tabpanel" aria-labelledby="nav-JATS-tab">
 					<p class="text-right my-3">JATS</p>
-				    <textarea id="JATS">в разработке</textarea>
+				    <textarea id="JATS">в разработке ' . $rexult_JATS . '</textarea>
 				    <div class="text-right mt-3">
 				    	<button id="button_jats" onclick="downloadJATS();">save as JATS</button>
 				    </div>
