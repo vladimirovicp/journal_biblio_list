@@ -302,7 +302,11 @@ $rexult_JATS = '<?xml version="1.0" encoding="UTF-8"?>
                 </trans-title-group>
             </title-group>
             <contrib-group>
+
 			</contrib-group>
+
+
+
         </article-meta>
     </front>
 </article>';
@@ -443,6 +447,53 @@ function FIO_autor_node($user_uid,$my_language){
 		$FIO = $field_lastname . ', ' . $Name_autor . ' ' . $Otchestvo_autor;
 	return $FIO;		
 }
+
+
+function FIO_autor_node_split($user_uid,$my_language){
+	$info_autor =  user_load($user_uid);
+	if ($my_language == 'ru') { $other_language = 'en';} else { $other_language = 'ru';}
+
+		if (isset($info_autor->field_lastname[$my_language]['0']['value'])){
+			$field_lastname=$info_autor->field_lastname[$my_language]['0']['value'];
+		} else {	
+			if (isset($info_autor->field_lastname['ru']['0']['value'])){$field_lastname=$info_autor->field_lastname['ru']['0']['value'];}
+			if (isset($info_autor->field_lastname['en']['0']['value'])){$field_lastname=$info_autor->field_lastname['en']['0']['value'];}	
+		}	
+
+
+		if (isset($info_autor->field_name2[$my_language]['0']['value'])){
+			$Name_autor=$info_autor->field_name2[$my_language]['0']['value'];
+		} else {	
+			if (isset($info_autor->field_name2['ru']['0']['value'])){$Name_autor=$info_autor->field_name2['ru']['0']['value'];}
+			if (isset($info_autor->field_name2['en']['0']['value'])){$Name_autor=$info_autor->field_name2['en']['0']['value'];}	
+		}			
+
+		$Otchestvo_autor = '';
+
+		if (isset($info_autor->field_middle_name[$my_language]['0']['value'])){
+			$Otchestvo_autor=$info_autor->field_middle_name[$my_language]['0']['value'];
+		} else {	
+			if (isset($info_autor->field_middle_name['ru']['0']['value'])){
+				$Otchestvo_autor=$info_autor->field_middle_name['ru']['0']['value'];
+			}
+			if (isset($info_autor->field_middle_name['en']['0']['value'])){
+				$Otchestvo_autor=$info_autor->field_middle_name['en']['0']['value'];
+			}	
+		}
+
+	if ($Otchestvo_autor != '') {
+		$given_names = $Name_autor . ' ' . $Otchestvo_autor;
+	} else {
+		$given_names = $Name_autor;
+	}
+
+	return array(
+		'surname'     => $field_lastname,
+		'given_names' => $given_names,
+	);		
+}
+
+
 
 function company_autor_node_id($company_uid,$my_language){
 	$info_autor =  user_load($company_uid);
