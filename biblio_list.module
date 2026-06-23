@@ -493,8 +493,6 @@ function FIO_autor_node_split($user_uid,$my_language){
 	);		
 }
 
-
-
 function company_autor_node_id($company_uid,$my_language){
 	$info_autor =  user_load($company_uid);
 	if (!empty($info_autor->field_company_link['und'])){
@@ -525,3 +523,36 @@ function  mybiblio_list_shielding_special_characters($text){
 		$text_rezult = str_replace(array("\r\n", "\r", "\n"), ' ', $text2);
 		return $text_rezult;		
 }
+
+
+function international_bases($user_uid){
+	$user = user_load($user_uid);
+
+	$field_researcherid = NULL;
+	if (isset($user->field_researcherid['und'][0]['value'])) {
+		$field_researcherid = $user->field_researcherid['und'][0]['value'];
+	}
+
+	$field_spin = NULL;
+	if (isset($user->field_spin_elibrary['und'][0]['value'])) {
+		$field_spin = $user->field_spin_elibrary['und'][0]['value'];
+	}
+
+	$field_scopusid = NULL;
+	if (isset($user->field_scopusid['und'][0]['value'])) {
+		$field_scopusid = $user->field_scopusid['und'][0]['value'];
+	}
+
+	$field_orcid = NULL;
+	if (isset($user->field_orcid['und'][0]['value'])) {
+		$field_orcid = $user->field_orcid['und'][0]['value'];
+	}
+
+	return array(
+		'scopusid'     => $field_scopusid,
+		'researcherid' => $field_researcherid,
+		'orcid'        => $field_orcid,
+		'spin'         => $field_spin,
+	);
+}
+
