@@ -1,0 +1,782 @@
+<?php
+
+function biblio_list_block_info() {
+
+  $blocks = [];
+
+  $blocks['cite article block'] = [
+    'info'  => t('Biblio list block '),
+  ];
+
+  return $blocks;
+}
+
+function biblio_list_block_view($delta = '') {
+
+   $block = array();
+
+  switch ($delta) {
+
+    case 'cite article block':
+
+      $block['subject'] = t('Cite');
+      $block['content'] = mybiblio_list_block_content();
+
+      break;
+  }
+
+
+  return $block;
+}
+
+
+function mybiblio_list_block_content() {
+
+  if (arg(0) == 'node' && is_numeric(arg(1))) {$nid = arg(1);}
+
+  $node_xml = node_load($nid);
+
+  //dpm($node_xml);
+
+// Если статья 
+  	if(isset($node_xml->field_early_access['und'][0]['value'])){
+  			if($node_xml->field_early_access['und'][0]['value'] == 1){
+					return '';
+				}
+				
+		}
+
+	// Получить только алиас (человекопонятный URL без домена и слэша, например: my-alias)
+	$alias = drupal_get_path_alias('node/' . $nid);
+	$absolute_url = url('node/' . $nid, array('absolute' => TRUE));
+
+	$journalTitle = variable_get("namesite_citation_en_en", "");
+	$journalTitleRu = variable_get("namesite_citation_ru_ru", "");
+	$issnPrint = variable_get("issnPrint_citation", "");
+	$issnOnline = variable_get("issnOnline_citation", "");
+
+//   edn
+
+
+/*---------------- XML --------------*/
+  //Заголовок
+  if (!empty($node_xml->title_field['en'][0]['value'])) {
+  	$TitlePage = $node_xml->title_field['en'][0]['value'];
+  } else{ $TitlePage = '';}
+
+	$TitlePageRu = '';
+	if (!empty($node_xml->title_field['ru'][0]['value'])) {
+		$TitlePageRu = $node_xml->title_field['ru'][0]['value'];
+	}
+
+	if(!empty($node_xml->field_journal_link['und'][0]['target_id'])){
+
+		$Number_Node_date = $node_xml->field_journal_link['und'][0]['target_id'];		
+		$nodeview = node_load($Number_Node_date);
+		
+		if(!empty($nodeview->field_date_publication['und'][0]['value'])){
+			$publicationDate = $nodeview->field_date_publication['und'][0]['value'];
+			$publicationDate = '<publicationDate>'.strtok($publicationDate, ' ').'</publicationDate>';			
+		} else {$publicationDate = '<publicationDate></publicationDate>';}
+
+
+		//Том
+		if(!empty($nodeview->field_volume['und'][0]['value'])){
+			$volume = $nodeview->field_volume['und'][0]['value'];		
+		} else { $volume = '';}
+
+
+		//Выпуск
+		if(!empty($nodeview->field_number['und'][0]['value'])){
+			$issue = $nodeview->field_number['und'][0]['value'];		
+		} else {$issue = '';}			
+
+	}
+
+		// Страница начала
+	  if (!empty($node_xml->field_page_no['und'][0]['value'])) {
+	  	$startPage = $node_xml->field_page_no['und'][0]['value'];
+	  } else{ $startPage = '';}	
+
+	   //Страница завершения
+	  if (!empty($node_xml->field_page_no_to['und'][0]['value'])) {
+	  	$endPage= $node_xml->field_page_no_to['und'][0]['value'];
+	  } else{ $endPage = '';}	
+
+
+	  // Doi
+	  if (!empty($node_xml->field_doi['und'][0]['value'])) {
+	  	$doi= $node_xml->field_doi['und'][0]['value'];
+	  } else{ $doi = '';}
+
+	//   edn
+	$edn="";
+	if (!empty($node_xml->field_edn['und'][0]['value'])) {
+		$edn= $node_xml->field_edn['und'][0]['value'];
+	} 
+	
+
+
+
+
+	  $my_language ='en';
+	  $FIO_autor_text = array();
+	  $affiliationId = array();
+	  $company_count=0;
+
+
+	  if (!empty($node_xml->field_autor['und'][0]['target_id'])) {
+	  	for ($i = 0; $i < count($node_xml->field_autor['und']); $i++) {
+
+	  		$user_uid = $node_xml->field_autor['und'][$i]['target_id'];
+	  		$FIO_autor_text[$i] = FIO_autor_node($user_uid,$my_language);
+	  		$Company_autor_id[$i] = company_autor_node_id($user_uid,$my_language);
+
+
+	  		if ($company_count == 0) {
+
+	  			$Company_list[$company_count] = $Company_autor_id[$i];
+	  			$company_count = $company_count + 1;
+	  			$affiliationId[$i] = $company_count;
+
+	  		} else{
+	  			if (!in_array($Company_autor_id[$i], $Company_list)) {
+				   	$Company_list[$company_count] = $Company_autor_id[$i];
+	  				$company_count = $company_count + 1;
+	  				$affiliationId[$i] = $company_count;
+				} else {
+					for ($k=0; $k<count($Company_list); $k++){
+						if ($Company_list[$k] == $Company_autor_id[$i]){
+							$affiliationId[$i] = $k+1;
+						}
+					}
+
+				}
+	  		}
+	  	}
+
+	  		$authors='<authors>';
+
+
+
+	  			for($j=0; $j<count($FIO_autor_text); $j++){
+	  				$authors = $authors . '
+    <author>
+      <name>' . $FIO_autor_text[$j] . '</name>
+      <affiliationId>' . $affiliationId[$j] . '</affiliationId>
+    </author>';
+	  			}
+	  		$authors = $authors . '
+  </authors>';
+  			$authors = $authors . '
+  <affiliationsList>';
+  		for ($i = 0; $i < count($Company_list); $i++) {
+  	$authors = $authors . '
+    <affiliationName affiliationId="' . ($i+1) . '">'.company_name($Company_list[$i],$my_language).'</affiliationName>';  			
+  		}
+  			$authors = $authors . '
+    </affiliationsList>';
+	  } else {
+	  	$authors = '';
+	  }
+
+	  if (!empty($node_xml->body['en'][0]['value'])) {
+	  	$abstract_preobraz = strip_tags($node_xml->body['en'][0]['value']);
+	  	$abstract = '';
+		$abstract = mybiblio_list_shielding_special_characters(htmlspecialchars($abstract_preobraz));
+	  } else{ $abstract = '';}
+
+	if (!empty($node_xml->field_text_pdf['und'][0]['uri'])) {
+		$fullTextUrl= file_create_url($node_xml->field_text_pdf['und'][0]['uri']);
+	} else{ $fullTextUrl = '';}
+		$keywords='';
+		$BibTeX_keywords='';
+	  if (!empty($node_xml->field_key_words[$my_language][0]['tid'])) {
+	  	$keywords = '<keywords language="eng">';
+	  	for ($i = 0; $i < count($node_xml->field_key_words[$my_language]); $i++) {
+
+	  		$term = taxonomy_term_load($node_xml->field_key_words[$my_language][$i]['tid']);
+			$name_keywords = $term->name;
+	  		$keywords = $keywords . '
+    <keyword>' . $name_keywords . '</keyword>';
+
+    		if ($i==0){$BibTeX_keywords=$name_keywords;}else{$BibTeX_keywords= $BibTeX_keywords .','. $name_keywords;}
+	  	}
+	  	$keywords = $keywords . '
+  </keywords>';
+	  }
+	$rezultXML ='<?xml version="1.0" encoding="UTF-8"?>
+<records>
+ <record>
+  <language>eng</language>
+  <publisher>Saratov State University</publisher>
+  <journalTitle>'.$journalTitle.'</journalTitle>
+  <issn>'.$issnPrint.'</issn>
+  <eissn>'.$issnOnline.'</eissn>
+  '.$publicationDate.' 
+  <volume>'.$volume.'</volume>
+  <issue>'.$issue.'</issue>
+  <startPage>'.$startPage .'</startPage>
+  <endPage>'.$endPage.'</endPage>
+  <doi>'.$doi.'</doi>
+  <documentType>article</documentType>
+  <title language="eng">'.$TitlePage.'</title>
+  '.$authors.'
+  <abstract language="eng">'.$abstract.'</abstract>
+  <fullTextUrl format="pdf">'.$fullTextUrl.'</fullTextUrl>
+  '.$keywords.'
+ </record>
+</records>';
+
+
+/*---------------- end XML --------------*/
+
+
+/*---------------- BibTeX --------------*/
+
+	$BibTeX_autor = '';
+
+	for($j=0; $j<count($FIO_autor_text); $j++){
+		if ($j==0){ $BibTeX_autor = $FIO_autor_text[$j];} else{$BibTeX_autor = $BibTeX_autor . ' and ' . $FIO_autor_text[$j];}
+	}
+
+
+	if(!empty($node_xml->field_journal_link['und'][0]['target_id'])){
+		$Journal_id = $node_xml->field_journal_link['und'][0]['target_id'];		
+		$Journal = node_load($Journal_id);
+		if (!empty($Journal->field_year['und'][0]['value'])) {
+				$Journal_year = mb_substr($Journal->field_year['und'][0]['value'],0,4);
+			} 
+		else 
+			{
+				$Journal_year="";
+			}
+	}
+
+	$BibTeX_address ="Saratov State University, ul. Astrakhanskaya, 83, Saratov, 410012, Russia";
+
+	$BibTeX_id_name=variable_get("BibTeX_id_name", "");
+
+	$rexultBibTeX = '@article{
+	'.$BibTeX_id_name.'-'. $volume . '-' . $issue. '-' .$startPage .',
+	author = {'.$BibTeX_autor.'},
+	title = {'.$TitlePage.'},
+	year = {'.$Journal_year.'},
+	journal = {'.$journalTitle.'},
+	volume = {'.$volume.'},
+	number = {'.$issue.'},
+	url = {'.$fullTextUrl.'},
+	address = {'.$BibTeX_address.'},
+	language = {'.$my_language.'},
+	doi = {'.$doi.'},
+	pages = {'.$startPage.'--'.$endPage.'},
+	issn = {'.$issnPrint.'},
+	keywords = {'.$BibTeX_keywords.'},
+	abstract = {'.$abstract.'}
+}';
+
+/*---------------- End BibTeX ----------*/
+
+
+/*------------------ JATS -------------*/
+
+// Формирование contrib-group для JATS
+$JATS_contrib = '';
+if (!empty($node_xml->field_autor['und'][0]['target_id'])) {
+	for ($i = 0; $i < count($node_xml->field_autor['und']); $i++) {
+		$user_uid = $node_xml->field_autor['und'][$i]['target_id'];
+		$name_ru = FIO_autor_node_split($user_uid, 'ru');
+		$name_en = FIO_autor_node_split($user_uid, 'en');
+		$bases = international_bases($user_uid);
+
+		$JATS_contrib .= '
+                <contrib contrib-type="author">
+                    <name>
+                        <surname>' . $name_ru['surname'] . '</surname>
+                        <given-names>' . $name_ru['given_names'] . '</given-names>
+                    </name>
+                    <name-alternatives>
+                        <name xml:lang="ru">
+                            <surname>' . $name_ru['surname'] . '</surname>
+                            <given-names>' . $name_ru['given_names'] . '</given-names>
+                        </name>
+                        <name xml:lang="en">
+                            <surname>' . $name_en['surname'] . '</surname>
+                            <given-names>' . $name_en['given_names'] . '</given-names>
+                        </name>
+                    </name-alternatives>
+                    <xref ref-type="aff" rid="aff' . $affiliationId[$i] . '"/>';
+		if (!empty($bases['scopusid'])) {
+			$JATS_contrib .= '
+                    <contrib-id contrib-id-type="scopusid">' . $bases['scopusid'] . '</contrib-id>';
+		}	
+		if (!empty($bases['researcherid'])) {
+			$JATS_contrib .= '
+                    <contrib-id contrib-id-type="researcherid">' . $bases['researcherid'] . '</contrib-id>';
+		}				
+		if (!empty($bases['orcid'])) {
+			$JATS_contrib .= '
+                    <contrib-id contrib-id-type="orcid">' . $bases['orcid'] . '</contrib-id>';
+		}
+		if (!empty($bases['spin'])) {
+			$JATS_contrib .= '
+                    <contrib-id contrib-id-type="spin">' . $bases['spin'] . '</contrib-id>';
+		}
+		$JATS_contrib .= '</contrib>';
+	}
+
+	for ($i = 0; $i < count($Company_list); $i++) {
+		$company_node = node_load($Company_list[$i]);
+		$company_title_en = '';
+		$company_title_ru = '';
+		if (!empty($company_node->title_field['en'][0]['value'])) {
+			$company_title_en = $company_node->title_field['en'][0]['value'];
+		}
+		if (!empty($company_node->title_field['ru'][0]['value'])) {
+			$company_title_ru = $company_node->title_field['ru'][0]['value'];
+		}
+		$JATS_contrib .= '
+                <aff-alternatives id="aff' . ($i + 1) . '">
+                    <aff>
+                        <institution xml:lang="en">' . $company_title_en . '</institution>
+                    </aff>
+                    <aff>
+                        <institution xml:lang="ru">' . $company_title_ru . '</institution>
+                    </aff>
+                </aff-alternatives>';
+	}
+}
+
+// Дата публикации для JATS (узел статьи)
+$JATS_pub_date = '';
+if (!empty($node_xml->field_published['und'][0]['value'])) {
+	$d = jats_parse_date($node_xml->field_published['und'][0]['value']);
+	if ($d) {
+		$JATS_pub_date = '
+            <pub-date iso-8601-date="' . $d['iso'] . '" pub-type="epub">
+                <day>' . $d['day'] . '</day>
+                <month>' . $d['month'] . '</month>
+                <year>' . $d['year'] . '</year>
+            </pub-date>';
+	}
+}
+
+// История дат для JATS (узел статьи)
+$JATS_date_received = '';
+if (!empty($node_xml->field_date_received['und'][0]['value'])) {
+	$d = jats_parse_date($node_xml->field_date_received['und'][0]['value']);
+	if ($d) {
+		$JATS_date_received = '
+                <date date-type="received" iso-8601-date="' . $d['iso'] . '">
+                    <day>' . $d['day'] . '</day>
+                    <month>' . $d['month'] . '</month>
+                    <year>' . $d['year'] . '</year>
+                </date>';
+	}
+}
+
+$JATS_date_accepted = '';
+if (!empty($node_xml->field_accepted['und'][0]['value'])) {
+	$d = jats_parse_date($node_xml->field_accepted['und'][0]['value']);
+	if ($d) {
+		$JATS_date_accepted = '
+                <date date-type="accepted" iso-8601-date="' . $d['iso'] . '">
+                    <day>' . $d['day'] . '</day>
+                    <month>' . $d['month'] . '</month>
+                    <year>' . $d['year'] . '</year>
+                </date>';
+	}
+}
+
+$JATS_history = '';
+if ($JATS_date_received != '' || $JATS_date_accepted != '') {
+	$JATS_history = '
+            <history>' . $JATS_date_received . $JATS_date_accepted . '
+            </history>';
+}
+
+// Аннотация на русском для JATS
+$abstract_ru = '';
+if (!empty($node_xml->body['ru'][0]['value'])) {
+	$abstract_ru_preobraz = strip_tags($node_xml->body['ru'][0]['value']);
+	$abstract_ru = mybiblio_list_shielding_special_characters(htmlspecialchars($abstract_ru_preobraz));
+}
+
+// Ключевые слова для JATS (оба языка)
+$JATS_kwd_ru = '';
+if (!empty($node_xml->field_key_words['ru'][0]['tid'])) {
+	$JATS_kwd_ru = '
+            <kwd-group xml:lang="ru">';
+	for ($i = 0; $i < count($node_xml->field_key_words['ru']); $i++) {
+		$term = taxonomy_term_load($node_xml->field_key_words['ru'][$i]['tid']);
+		$JATS_kwd_ru .= '
+                <kwd>' . $term->name . '</kwd>';
+	}
+	$JATS_kwd_ru .= '
+            </kwd-group>';
+}
+
+$JATS_kwd_en = '';
+if (!empty($node_xml->field_key_words['en'][0]['tid'])) {
+	$JATS_kwd_en = '
+            <kwd-group xml:lang="en">';
+	for ($i = 0; $i < count($node_xml->field_key_words['en']); $i++) {
+		$term = taxonomy_term_load($node_xml->field_key_words['en'][$i]['tid']);
+		$JATS_kwd_en .= '
+                <kwd>' . $term->name . '</kwd>';
+	}
+	$JATS_kwd_en .= '
+            </kwd-group>';
+}
+
+// ref-list для JATS (список литературы)
+$JATS_refs = '';
+$refs = read_literature($node_xml);
+if (!empty($refs)) {
+	$i = 1;
+	foreach ($refs as $ref) {
+		$JATS_refs .= '
+            <ref id="ref' . $i . '">
+                <mixed-citation xml:lang="ru">' . $ref['text'] . '</mixed-citation>
+            </ref>';
+		$i++;
+	}
+}
+
+$rexult_JATS = '<?xml version="1.0" encoding="UTF-8"?>
+<article xmlns:xlink="http://www.w3.org/1999/xlink" article-type="research-article" dtd-version="1.4" xml:lang="en">
+    <front>
+        <journal-meta>
+            <journal-title-group>
+                <journal-title xml:lang="ru">  '.$journalTitleRu.'  </journal-title>
+            </journal-title-group>
+            <journal-id journal-id-type="issn"> '.$issnPrint.' </journal-id>
+            <journal-id journal-id-type="eissn"> '.$issnOnline.' </journal-id>
+        </journal-meta>
+        <article-meta>
+            <article-id pub-id-type="doi"> '.$doi.' </article-id>
+            <article-id pub-id-type="edn"> '.$edn.' </article-id>
+            <article-id pub-id-type="uri"> '.$absolute_url.' </article-id>
+            <self-uri> '.$absolute_url.' </self-uri>
+            <title-group>
+                <article-title xml:lang="ru">'.$TitlePageRu.'</article-title>
+                <trans-title-group xml:lang="en">
+                    <trans-title>'.$TitlePage.'</trans-title>
+                </trans-title-group>
+            </title-group>
+            <contrib-group>' . $JATS_contrib . '
+            </contrib-group>' . $JATS_pub_date . '
+            <volume>' . $volume . '</volume>
+            <issue>' . $issue . '</issue>
+            <fpage>' . $startPage . '</fpage>
+            <lpage>' . $endPage . '</lpage>' . $JATS_history . '
+            <permissions>
+                <license>
+                    <license-p xml:lang="ru">CC BY 4.0</license-p>
+                </license>
+            </permissions>
+            <abstract xml:lang="ru">'
+                . $abstract_ru . 
+			'</abstract>
+            <trans-abstract xml:lang="en">
+                ' . $abstract . '
+            </trans-abstract>' . $JATS_kwd_ru . $JATS_kwd_en . '
+        </article-meta>
+    </front>
+    <back>
+        <ref-list>' . $JATS_refs . '
+        </ref-list>
+    </back>
+</article>';
+
+/*---------------- End JATS ----------*/
+
+  drupal_add_js(drupal_get_path('module', 'biblio_list') . '/js/biblio_list.js');
+  drupal_add_css(drupal_get_path('module', 'biblio_list') . '/css/biblio_list.css');
+
+  $path_libraries_fileSaverJs = libraries_get_path('FileSaver.js'). '/FileSaver.min.js';
+  drupal_add_js($path_libraries_fileSaverJs);
+
+
+	drupal_add_js('
+	    function downloadXML(){
+	      var save = document.getElementById("xml").value;  
+	      var blob = new Blob([save], {type: "text/plain;charset=utf-8"});
+	      var mainName = document.getElementsByClassName("page-title")[0].innerHTML;
+	      saveAs(blob, mainName + ".xml");
+	    }
+
+	    function downloadBibTeX(){
+	      var save = document.getElementById("BibTeX").value;  
+	      var blob = new Blob([save], {type: "text/plain;charset=utf-8"});
+	      var mainName = document.getElementsByClassName("page-title")[0].innerHTML;
+	      saveAs(blob, mainName + ".bib");
+	    }
+
+	    function downloadJATS(){
+	      var save = document.getElementById("JATS").value;  
+	      var blob = new Blob([save], {type: "text/plain;charset=utf-8"});
+	      var mainName = document.getElementsByClassName("page-title")[0].innerHTML;
+	      saveAs(blob, mainName + ".xml");
+	    }
+	', array(
+	  'type' => 'inline',
+	  'scope' => 'footer',
+	  'weight' => 5,
+	));	 
+
+	return '
+
+		<!-- Button trigger modal -->
+		<div class="text-right">
+			<button type="button" class="btn btn-secondary" data-toggle="modal" data-target="#CiteModal">' .
+			  t('XML') .'
+			</button>
+		</div>
+
+		<!-- Modal -->
+		<div class="modal fade" id="CiteModal" tabindex="-1" role="dialog" aria-labelledby="CiteModalTitle" aria-hidden="true">
+		  <div class="modal-dialog modal-dialog-centered" role="document">
+		    <div class="modal-content">
+		      <div class="modal-header">
+		        <h5 class="modal-title" id="CiteModalLongTitle">'. t('XML') .'</h5>
+		        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+		          <span aria-hidden="true">&times;</span>
+		        </button>
+		      </div>
+		      <div class="modal-body">
+				<nav>
+				  <div class="nav nav-tabs" id="nav-tab" role="tablist">
+				    <a class="nav-item nav-link active" id="nav-xml-tab" data-toggle="tab" href="#nav-xml" role="tab" aria-controls="nav-xml" aria-selected="true">DOAJ</a>
+				    <a class="nav-item nav-link" id="nav-BibTeX-tab" data-toggle="tab" href="#nav-BibTeX" role="tab" aria-controls="nav-BibTeX" aria-selected="false">BibTeX</a>
+				    <a class="nav-item nav-link" id="nav-JATS-tab" data-toggle="tab" href="#nav-JATS" role="tab" aria-controls="nav-JATS" aria-selected="false">JATS</a>
+				  </div>
+				</nav>
+				<div class="tab-content" id="nav-tabContent">
+
+				  <div class="tab-pane fade show active" id="nav-xml" role="tabpanel" aria-labelledby="nav-home-tab">
+				    <p class="text-right my-3">XML для сайта doaj.org</p>
+				    <textarea id="xml">'.$rezultXML.'</textarea>
+				    <div class="text-right mt-3">
+				    	<button id="button_xml" onclick="downloadXML();">save as xml</button>
+				    </div>
+				  </div>
+
+				  <div class="tab-pane fade" id="nav-BibTeX" role="tabpanel" aria-labelledby="nav-profile-tab">
+					<p class="text-right my-3">BibTeX</p>
+				    <textarea id="BibTeX">'.$rexultBibTeX.'</textarea>
+				    <div class="text-right mt-3">
+				    	<button id="button_xml" onclick="downloadBibTeX();">save as BibTeX</button>
+				    </div>
+
+				  </div>
+
+				  <div class="tab-pane fade" id="nav-JATS" role="tabpanel" aria-labelledby="nav-JATS-tab">
+					<p class="text-right my-3">JATS</p>
+				    <textarea id="JATS">' . $rexult_JATS . '</textarea>
+				    <div class="text-right mt-3">
+				    	<button id="button_jats" onclick="downloadJATS();">save as JATS</button>
+				    </div>
+				  </div>
+
+				  </div>				  
+				
+		      </div>
+		    </div>
+
+		  </div>
+		</div>
+	';    
+
+}
+
+
+function FIO_autor_node($user_uid,$my_language){
+	$info_autor =  user_load($user_uid);
+	if ($my_language == 'ru') { $other_language = 'en';} else { $other_language = 'ru';}
+
+		if (isset($info_autor->field_lastname[$my_language]['0']['value'])){
+			$field_lastname=$info_autor->field_lastname[$my_language]['0']['value'];
+		} else {	
+			if (isset($info_autor->field_lastname['ru']['0']['value'])){$field_lastname=$info_autor->field_lastname['ru']['0']['value'];}
+			if (isset($info_autor->field_lastname['en']['0']['value'])){$field_lastname=$info_autor->field_lastname['en']['0']['value'];}	
+		}	
+
+
+		if (isset($info_autor->field_name2[$my_language]['0']['value'])){
+			$Name_autor=$info_autor->field_name2[$my_language]['0']['value'];
+		} else {	
+			if (isset($info_autor->field_name2['ru']['0']['value'])){$Name_autor=$info_autor->field_name2['ru']['0']['value'];}
+			if (isset($info_autor->field_name2['en']['0']['value'])){$Name_autor=$info_autor->field_name2['en']['0']['value'];}	
+		}			
+
+		$Otchestvo_autor = '';
+
+		if (isset($info_autor->field_middle_name[$my_language]['0']['value'])){
+			$Otchestvo_autor=$info_autor->field_middle_name[$my_language]['0']['value'];
+		} else {	
+			if (isset($info_autor->field_middle_name['ru']['0']['value'])){
+				$Otchestvo_autor=$info_autor->field_middle_name['ru']['0']['value'];
+			}
+			if (isset($info_autor->field_middle_name['en']['0']['value'])){
+				$Otchestvo_autor=$info_autor->field_middle_name['en']['0']['value'];
+			}	
+		}
+		$FIO = $field_lastname . ', ' . $Name_autor . ' ' . $Otchestvo_autor;
+	return $FIO;		
+}
+
+
+function FIO_autor_node_split($user_uid,$my_language){
+	$info_autor =  user_load($user_uid);
+	if ($my_language == 'ru') { $other_language = 'en';} else { $other_language = 'ru';}
+
+		if (isset($info_autor->field_lastname[$my_language]['0']['value'])){
+			$field_lastname=$info_autor->field_lastname[$my_language]['0']['value'];
+		} else {	
+			if (isset($info_autor->field_lastname['ru']['0']['value'])){$field_lastname=$info_autor->field_lastname['ru']['0']['value'];}
+			if (isset($info_autor->field_lastname['en']['0']['value'])){$field_lastname=$info_autor->field_lastname['en']['0']['value'];}	
+		}	
+
+
+		if (isset($info_autor->field_name2[$my_language]['0']['value'])){
+			$Name_autor=$info_autor->field_name2[$my_language]['0']['value'];
+		} else {	
+			if (isset($info_autor->field_name2['ru']['0']['value'])){$Name_autor=$info_autor->field_name2['ru']['0']['value'];}
+			if (isset($info_autor->field_name2['en']['0']['value'])){$Name_autor=$info_autor->field_name2['en']['0']['value'];}	
+		}			
+
+		$Otchestvo_autor = '';
+
+		if (isset($info_autor->field_middle_name[$my_language]['0']['value'])){
+			$Otchestvo_autor=$info_autor->field_middle_name[$my_language]['0']['value'];
+		} else {	
+			if (isset($info_autor->field_middle_name['ru']['0']['value'])){
+				$Otchestvo_autor=$info_autor->field_middle_name['ru']['0']['value'];
+			}
+			if (isset($info_autor->field_middle_name['en']['0']['value'])){
+				$Otchestvo_autor=$info_autor->field_middle_name['en']['0']['value'];
+			}	
+		}
+
+	if ($Otchestvo_autor != '') {
+		$given_names = $Name_autor . ' ' . $Otchestvo_autor;
+	} else {
+		$given_names = $Name_autor;
+	}
+
+	return array(
+		'surname'     => $field_lastname,
+		'given_names' => $given_names,
+	);		
+}
+
+function company_autor_node_id($company_uid,$my_language){
+	$info_autor =  user_load($company_uid);
+	if (!empty($info_autor->field_company_link['und'])){
+		return $info_autor->field_company_link['und'][0]['target_id'];
+	} 
+}
+
+function company_name($node_uid,$my_language){
+
+	$node_company_name = node_load($node_uid);
+	if (!empty($node_company_name->title_field[$my_language][0]['value'])){
+		return $node_company_name->title_field[$my_language][0]['value'] . ', ' . $node_company_name->field_address[$my_language][0]['value'];
+	} 
+}
+
+function  mybiblio_list_shielding_special_characters($text){
+		$text2 = strip_tags($text);
+		$text2=preg_replace('/&(?!#?[a-z0-9]+;)/', '&amp;', $text2);
+
+		$simbol1="&lt;";
+		$simbol2="&quot;";
+		$simbol3="&gt;";
+		$simbol4="&amp;";
+
+		$healthy = array("<",'"', ">","&");
+		$yummy   = array($simbol1, $simbol2, $simbol3,$simbol4);
+		$text2 = str_replace($healthy, $yummy, $text2);	
+		$text_rezult = str_replace(array("\r\n", "\r", "\n"), ' ', $text2);
+		return $text_rezult;		
+}
+
+
+function international_bases($user_uid){
+	$user = user_load($user_uid);
+
+	$field_researcherid = NULL;
+	if (isset($user->field_researcherid['und'][0]['value'])) {
+		$field_researcherid = $user->field_researcherid['und'][0]['value'];
+	}
+
+	$field_spin = NULL;
+	if (isset($user->field_spin_elibrary['und'][0]['value'])) {
+		$field_spin = $user->field_spin_elibrary['und'][0]['value'];
+	}
+
+	$field_scopusid = NULL;
+	if (isset($user->field_scopusid['und'][0]['value'])) {
+		$field_scopusid = $user->field_scopusid['und'][0]['value'];
+	}
+
+	$field_orcid = NULL;
+	if (isset($user->field_orcid['und'][0]['value'])) {
+		$field_orcid = $user->field_orcid['und'][0]['value'];
+	}
+
+	$lines = array();
+
+	if ($field_scopusid !== NULL && $field_scopusid !== '') {
+		$lines['scopusid'] = $field_scopusid;
+	}
+	if ($field_researcherid !== NULL && $field_researcherid !== '') {
+		$lines['researcherid'] = $field_researcherid;
+	}
+	if ($field_orcid !== NULL && $field_orcid !== '') {
+		$lines['orcid'] = $field_orcid;
+	}
+	if ($field_spin !== NULL && $field_spin !== '') {
+		$lines['spin'] = $field_spin;
+	}
+
+	return $lines;
+}
+
+function jats_parse_date($date_raw) {
+	$date_part = strtok(trim($date_raw), " T");
+	$parts = explode('-', $date_part);
+	if (count($parts) === 3) {
+		return array(
+			'iso'   => $date_part,
+			'year'  => $parts[0],
+			'month' => $parts[1],
+			'day'   => $parts[2],
+		);
+	}
+	return NULL;
+}
+
+function read_literature($node_xml) {
+	$items = field_get_items('node', $node_xml, 'field_literature');
+	if (empty($items[0]['value'])) {
+		return array();
+	}
+
+	$html = $items[0]['value'];
+	if (!preg_match_all('/<li\b[^>]*>(.*?)<\/li>/siu', $html, $matches)) {
+		return array();
+	}
+
+	$result = array();
+	foreach ($matches[1] as $li) {
+		$text = html_entity_decode($li, ENT_QUOTES | ENT_HTML5, 'UTF-8');
+		$text = strip_tags($text);
+		$text = trim($text);
+		$result[] = array('text' => $text);
+	}
+
+	return $result;
+}
+

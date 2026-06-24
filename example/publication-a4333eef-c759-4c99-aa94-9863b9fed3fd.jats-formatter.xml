@@ -1,0 +1,196 @@
+<article xmlns:xlink="http://www.w3.org/1999/xlink" article-type="research-article" dtd-version="1.4" xml:lang="en">
+    <front>
+        <journal-meta>
+            <journal-title-group>
+                <journal-title xml:lang="ru">Известия Саратовского университета. Новая серия. Серия: Математика. Механика. Информатика</journal-title>
+            </journal-title-group>
+            <journal-id journal-id-type="issn">1816-9791</journal-id>
+            <journal-id journal-id-type="eissn">2541-9005</journal-id>
+        </journal-meta>
+        <article-meta>
+            <article-id pub-id-type="doi">10.18500/1816-9791-2026-26-1-145-155</article-id>
+            <article-id pub-id-type="edn">XIYXTG</article-id>
+            <article-id pub-id-type="uri">https://mmi.sgu.ru/ru/articles/priblizhennyy-metod-analiza-sistemy-massovogo-obsluzhivaniya-s-neordinarnym-vhodyashchim</article-id>
+            <self-uri>https://mmi.sgu.ru/ru/articles/priblizhennyy-metod-analiza-sistemy-massovogo-obsluzhivaniya-s-neordinarnym-vhodyashchim</self-uri>
+            <title-group>
+                <article-title xml:lang="ru">Приближенный метод анализа системы массового обслуживания с неординарным входящим потоком и групповым обслуживанием</article-title>
+                <trans-title-group xml:lang="en">
+                    <trans-title>An approximate method for analyzing a queuing system with batch arrivals and batch services</trans-title>
+                </trans-title-group>
+            </title-group>
+            <contrib-group>
+                <contrib contrib-type="author">
+                    <name>
+                        <surname>Сергеева</surname>
+                        <given-names>Надежда Викторовна</given-names>
+                    </name>
+                    <name-alternatives>
+                        <name xml:lang="ru">
+                            <surname>Сергеева</surname>
+                            <given-names>Надежда Викторовна</given-names>
+                        </name>
+                        <name xml:lang="en">
+                            <surname>Sergeeva</surname>
+                            <given-names>Nadezhda Viktorovna</given-names>
+                        </name>
+                    </name-alternatives>
+                    <xref ref-type="aff" rid="aff1"/>
+                    <contrib-id contrib-id-type="orcid">0000-0001-6125-7078</contrib-id>
+                </contrib>
+                <contrib contrib-type="author">
+                    <name>
+                        <surname>Станкевич</surname>
+                        <given-names>Елена Петровна</given-names>
+                    </name>
+                    <name-alternatives>
+                        <name xml:lang="ru">
+                            <surname>Станкевич</surname>
+                            <given-names>Елена Петровна</given-names>
+                        </name>
+                        <name xml:lang="en">
+                            <surname>Stankevich</surname>
+                            <given-names>Elena Petrovna</given-names>
+                        </name>
+                    </name-alternatives>
+                    <xref ref-type="aff" rid="aff1"/>
+                    <contrib-id contrib-id-type="orcid">0000-0003-0630-4550</contrib-id>
+                </contrib>
+                <contrib contrib-type="author">
+                    <name>
+                        <surname>Тананко</surname>
+                        <given-names>Игорь Евстафьевич</given-names>
+                    </name>
+                    <name-alternatives>
+                        <name xml:lang="ru">
+                            <surname>Тананко</surname>
+                            <given-names>Игорь Евстафьевич</given-names>
+                        </name>
+                        <name xml:lang="en">
+                            <surname>Tananko</surname>
+                            <given-names>Igor Evstaf'evich</given-names>
+                        </name>
+                    </name-alternatives>
+                    <xref ref-type="aff" rid="aff1"/>
+                    <contrib-id contrib-id-type="orcid">0000-0001-8960-9709</contrib-id>
+                </contrib>
+                <aff-alternatives id="aff1">
+                    <aff>
+                        <institution xml:lang="en">Saratov State University</institution>
+                    </aff>
+                    <aff>
+                        <institution xml:lang="ru">Саратовский национальный исследовательский государственный университет имени Н. Г. Чернышевского</institution>
+                    </aff>
+                </aff-alternatives>
+            </contrib-group>
+            <pub-date iso-8601-date="2026-03-02" pub-type="epub">
+                <day>02</day>
+                <month>03</month>
+                <year>2026</year>
+            </pub-date>
+            <volume>26</volume>
+            <issue>1</issue>
+            <fpage>145</fpage>
+            <lpage>155</lpage>
+            <history>
+                <date date-type="received" iso-8601-date="2025-11-27">
+                    <day>27</day>
+                    <month>11</month>
+                    <year>2025</year>
+                </date>
+                <date date-type="accepted" iso-8601-date="2025-12-07">
+                    <day>07</day>
+                    <month>12</month>
+                    <year>2025</year>
+                </date>
+            </history>
+            <permissions>
+                <license>
+                    <license-p xml:lang="ru">CC BY 4.0</license-p>
+                </license>
+            </permissions>
+            <abstract xml:lang="ru">
+                <p>Рассматривается система массового обслуживания с одним прибором и буфером бесконечной емкости. Из источника в систему в некоторый момент времени может поступить одно или сразу два требования с заданными вероятностями. Длительности интервалов времени между поступлениями требований являются экспоненциально распределенными случайными величинами. Требования выбираются из буфера случайным образом и обслуживаются группами фиксированного размера. Длительность обслуживания группы имеет экспоненциальное распределение. После завершения обслуживания вся группа мгновенно покидает систему. Если в этот момент в очереди системы группа требований не сформирована, то прибор ожидает, пока в систему не поступит необходимое число требований. Используя метод производящих функций, в работе получены формулы для вычисления стационарных вероятностей состояний рассматриваемой системы, математического ожидания числа требований в системе и математического ожидания длительности пребывания требований в системе. Предложен приближенный метод анализа системы с групповым входящим потоком и групповым обслуживанием, в основе которого лежит метод анализа системы обслуживания с ординарным входящим потоком и групповым обслуживанием. Проведен сравнительный анализ результатов вычислений характеристик, полученных с использованием точного и приближенного методов анализа рассматриваемой системы обслуживания.</p>
+            </abstract>
+            <trans-abstract xml:lang="en">
+                <p>A queueing system with a single server and an infinite-capacity buffer is considered. At any given time, one or two customers with specified probabilities can be received at once. The durations of intervals between arrivals of customers&amp;nbsp; are exponentially distributed random variables. The customers are randomly selected from the buffer&amp;nbsp;and served in batches of a fixed size. Customers are served as a unique batch of a given size with exponentially distributed service time. After the completion of service, the entire batch instantly leaves the system. If a batch of customers is not formed in the system queue at this moment, the server waits until the required number of customers is received by the system. Using the method of probability generating functions, expressions for the stationary probabilities of the system with batch arrivals and batch services are obtained. The average queue size and the average sojourn time in the system are derived. An approximate method for analyzing systems with batch arrivals and batch services based on a queueing system with ordinary&amp;nbsp; arrivals and batch services is proposed. A comparative analysis of the results of calculations of the characteristics obtained using accurate and approximate methods of analysis of the service system under consideration is carried out.</p>
+            </trans-abstract>
+            <kwd-group xml:lang="ru">
+                <kwd>система массового обслуживания</kwd>
+                <kwd>групповой входящий поток</kwd>
+                <kwd>групповое обслуживание</kwd>
+            </kwd-group>
+            <kwd-group xml:lang="en">
+                <kwd>queueing system</kwd>
+                <kwd>batch arrival</kwd>
+                <kwd>batch service</kwd>
+            </kwd-group>
+        </article-meta>
+    </front>
+    <back>
+        <ref-list>
+            <ref id="ref1">
+                <mixed-citation xml:lang="ru">Bailey N. On queueing processes with bulk service // Journal of the Royal Statistical Society. Series B (Methodological). 1954. Vol. 16. P. 80–87.</mixed-citation>
+            </ref>
+            <ref id="ref2">
+                <mixed-citation xml:lang="ru">Gaver D. Imbedded Markov chain analysis of a waiting-line process in continuous time // The Annals of Mathematical Statistics. 1959. Vol. 30, iss. 3. P. 698–720. DOI: https://doi.org/10.1214/aoms/1177706200</mixed-citation>
+            </ref>
+            <ref id="ref3">
+                <mixed-citation xml:lang="ru">Medhi J. Stochastic models in queueing theory. 2nd ed. San Diego : Elsevier Science, 2002. 482 p.</mixed-citation>
+            </ref>
+            <ref id="ref4">
+                <mixed-citation xml:lang="ru">Клейнрок Л. Теория массового обслуживания. Москва : Машиностроение, 1979. 432 с.</mixed-citation>
+            </ref>
+            <ref id="ref5">
+                <mixed-citation xml:lang="ru">Bolch G., Greiner S., de Meer H., Trivedi K. S. Queueing networks and Markov chains: Modeling and performance evaluation with computer science applications. New Jersey : John Wiley &amp; Sons, 2006. 896 p. DOI: https://doi.org/10.1002/0471791571</mixed-citation>
+            </ref>
+            <ref id="ref6">
+                <mixed-citation xml:lang="ru">Chaudhry M. L., Templeton J. G. C. A first course in bulk queues. New York : John Wiley &amp; Sons, 1983. 372 p.</mixed-citation>
+            </ref>
+            <ref id="ref7">
+                <mixed-citation xml:lang="ru">Santhi K., Saravanan R. Performance analysis of cloud computing bulk service using queueing models // International Journal of Applied Engineering Research. 2017. Vol. 12, iss. 17. P. 6487-6492.</mixed-citation>
+            </ref>
+            <ref id="ref8">
+                <mixed-citation xml:lang="ru">Chao X., Miyazawa M., Pinedo M. Queueing networks: Customers, signals and product form solutions. New York : John Wiley &amp; Sons, 1999. 464 p.</mixed-citation>
+            </ref>
+            <ref id="ref9">
+                <mixed-citation xml:lang="ru">Ritha W., Sreelekha B. Fuzzy steady state analysis of MX/M(A,B)/1 queue models with random breakdowns // International Journal of Applied Engineering and Technology. 2012. Vol. 2, iss. 2. P. 200–207.</mixed-citation>
+            </ref>
+            <ref id="ref10">
+                <mixed-citation xml:lang="ru">Nakamura A., Phung-Duc T. Stationary analysis of infinite server queue with batch service // Performance Engineering and Stochastic Modeling. EPEW ASMTA 2021 / eds.: P. Ballarini, H. Castel, I. Dimitriou, M. Iacono, T. Phung-Duc, J. Walraevens. Cham : Springer, 2021. P. 411-424. (Lecture Notes in Computer Science. Vol. 13104). DOI: https://doi.org/10.1007/978-3-030-91825-5_25</mixed-citation>
+            </ref>
+            <ref id="ref11">
+                <mixed-citation xml:lang="ru">Nakamura A., Phung-Duc T. Exact and asymptotic analysis of infinite server batch service queues with random batch sizes // Queueing Systems. 2024. Vol. 106. P. 129–158. DOI: https://doi.org/10.1007/s11134-023-09898-4</mixed-citation>
+            </ref>
+            <ref id="ref12">
+                <mixed-citation xml:lang="ru">Gupta G. K., Banerjee A. Steady state analysis of system size-based balking in M/Mb/1 queue // International Journal of Mathematics in Operational Research. 2019. Vol. 14, iss. 3. P. 319–337. DOI: https://doi.org/10.1504/IJMOR.2019.099383</mixed-citation>
+            </ref>
+            <ref id="ref13">
+                <mixed-citation xml:lang="ru">Chen A., Pollett Ph., Li J., Zhang H. Markovian bulk-arrival and bulk-service queues with state-dependent control // Queueing Systems. 2010. Vol. 64. P. 267–304. DOI: https://doi.org/10.1007/s11134-009-9162-5</mixed-citation>
+            </ref>
+            <ref id="ref14">
+                <mixed-citation xml:lang="ru">Chen A., Wu X., Zhang J. Markovian bulk-arrival and bulk-service queues with general state-dependent control // Queueing Systems. 2020. Vol. 95. P. 331–378. DOI: https://doi.org/10.1007/s11134-020-09660-0</mixed-citation>
+            </ref>
+            <ref id="ref15">
+                <mixed-citation xml:lang="ru">Stadje W. Some exact expressions for the bulk-arrival queue MX/M/1 // Queueing Systems. 1989. Vol. 4. P. 85–92. DOI: https://doi.org/10.1007/BF01150859</mixed-citation>
+            </ref>
+            <ref id="ref16">
+                <mixed-citation xml:lang="ru">Rama G., Ramshankar R., Ramanarayanan R. M/M/1 bulk arrival and bulk service queue with randomly varying environment // IOSR Journal of Mathematics. 2014. Vol. 10, iss. 6. P. 58–66. DOI: https://doi.org/10.9790/5728-10635866</mixed-citation>
+            </ref>
+            <ref id="ref17">
+                <mixed-citation xml:lang="ru">Gupta G. K., Banerjee A. On finite buffer bulk arrival bulk service queue with queue length and batch size dependent service // International Journal of Applied and Computational Mathematics. 2019. Vol. 5. Art. 32. DOI: https://doi.org/10.1007/s40819-019-0617-z</mixed-citation>
+            </ref>
+            <ref id="ref18">
+                <mixed-citation xml:lang="ru">Bhat U. N. Imbedded Markov chain analysis of single server bulk queues // Journal of the Australian Mathematical Society. 1964. Vol. 4, iss. 2. P. 244–263. DOI: https://doi.org/10.1017/S1446788700023454</mixed-citation>
+            </ref>
+            <ref id="ref19">
+                <mixed-citation xml:lang="ru">Stankevich E., Tananko I., Pagano M. Optimization of open queueing networks with batch services // Mathematics. 2022. Vol. 10, iss. 16. Art. 3027. DOI: https://doi.org/10.3390/math10163027</mixed-citation>
+            </ref>
+            <ref id="ref20">
+                <mixed-citation xml:lang="ru">Станкевич Е. П., Тананко И. Е., Пагано М. Анализ системы массового обслуживания с групповым обслуживанием требований // Компьютерные науки и информационные технологии : материалы международ. науч. конф. Саратов : Научная книга, 2021. С. 148–151. EDN: PGOIEL</mixed-citation>
+            </ref>
+            <ref id="ref21">
+                <mixed-citation xml:lang="ru">Вишневский В. М. Теоретические основы проектирования компьютерных сетей. Москва : Техносфера, 2003. 506 с.</mixed-citation>
+            </ref>
+        </ref-list>
+    </back>
+</article>
