@@ -306,12 +306,23 @@ if (!empty($node_xml->field_autor['und'][0]['target_id'])) {
                         </name>
                     </name-alternatives>
                     <xref ref-type="aff" rid="aff' . $affiliationId[$i] . '"/>';
+		if (!empty($bases['scopusid'])) {
+			$JATS_contrib .= '
+                    <contrib-id contrib-id-type="scopusid">' . $bases['scopusid'] . '</contrib-id>';
+		}	
+		if (!empty($bases['researcherid'])) {
+			$JATS_contrib .= '
+                    <contrib-id contrib-id-type="researcherid">' . $bases['researcherid'] . '</contrib-id>';
+		}				
 		if (!empty($bases['orcid'])) {
 			$JATS_contrib .= '
                     <contrib-id contrib-id-type="orcid">' . $bases['orcid'] . '</contrib-id>';
 		}
-		$JATS_contrib .= '
-                </contrib>';
+		if (!empty($bases['spin'])) {
+			$JATS_contrib .= '
+                    <contrib-id contrib-id-type="spin">' . $bases['spin'] . '</contrib-id>';
+		}
+		$JATS_contrib .= '</contrib>';
 	}
 
 	for ($i = 0; $i < count($Company_list); $i++) {
@@ -336,6 +347,88 @@ if (!empty($node_xml->field_autor['und'][0]['target_id'])) {
 	}
 }
 
+// Дата публикации для JATS (узел статьи)
+$JATS_pub_date = '';
+if (!empty($node_xml->field_published['und'][0]['value'])) {
+	$d = jats_parse_date($node_xml->field_published['und'][0]['value']);
+	if ($d) {
+		$JATS_pub_date = '
+            <pub-date iso-8601-date="' . $d['iso'] . '" pub-type="epub">
+                <day>' . $d['day'] . '</day>
+                <month>' . $d['month'] . '</month>
+                <year>' . $d['year'] . '</year>
+            </pub-date>';
+	}
+}
+
+// История дат для JATS (узел статьи)
+$JATS_date_received = '';
+if (!empty($node_xml->field_date_received['und'][0]['value'])) {
+	$d = jats_parse_date($node_xml->field_date_received['und'][0]['value']);
+	if ($d) {
+		$JATS_date_received = '
+                <date date-type="received" iso-8601-date="' . $d['iso'] . '">
+                    <day>' . $d['day'] . '</day>
+                    <month>' . $d['month'] . '</month>
+                    <year>' . $d['year'] . '</year>
+                </date>';
+	}
+}
+
+$JATS_date_accepted = '';
+if (!empty($node_xml->field_accepted['und'][0]['value'])) {
+	$d = jats_parse_date($node_xml->field_accepted['und'][0]['value']);
+	if ($d) {
+		$JATS_date_accepted = '
+                <date date-type="accepted" iso-8601-date="' . $d['iso'] . '">
+                    <day>' . $d['day'] . '</day>
+                    <month>' . $d['month'] . '</month>
+                    <year>' . $d['year'] . '</year>
+                </date>';
+	}
+}
+
+$JATS_history = '';
+if ($JATS_date_received != '' || $JATS_date_accepted != '') {
+	$JATS_history = '
+            <history>' . $JATS_date_received . $JATS_date_accepted . '
+            </history>';
+}
+
+// Аннотация на русском для JATS
+$abstract_ru = '';
+if (!empty($node_xml->body['ru'][0]['value'])) {
+	$abstract_ru_preobraz = strip_tags($node_xml->body['ru'][0]['value']);
+	$abstract_ru = mybiblio_list_shielding_special_characters(htmlspecialchars($abstract_ru_preobraz));
+}
+
+// Ключевые слова для JATS (оба языка)
+$JATS_kwd_ru = '';
+if (!empty($node_xml->field_key_words['ru'][0]['tid'])) {
+	$JATS_kwd_ru = '
+            <kwd-group xml:lang="ru">';
+	for ($i = 0; $i < count($node_xml->field_key_words['ru']); $i++) {
+		$term = taxonomy_term_load($node_xml->field_key_words['ru'][$i]['tid']);
+		$JATS_kwd_ru .= '
+                <kwd>' . $term->name . '</kwd>';
+	}
+	$JATS_kwd_ru .= '
+            </kwd-group>';
+}
+
+$JATS_kwd_en = '';
+if (!empty($node_xml->field_key_words['en'][0]['tid'])) {
+	$JATS_kwd_en = '
+            <kwd-group xml:lang="en">';
+	for ($i = 0; $i < count($node_xml->field_key_words['en']); $i++) {
+		$term = taxonomy_term_load($node_xml->field_key_words['en'][$i]['tid']);
+		$JATS_kwd_en .= '
+                <kwd>' . $term->name . '</kwd>';
+	}
+	$JATS_kwd_en .= '
+            </kwd-group>';
+}
+
 $rexult_JATS = '<?xml version="1.0" encoding="UTF-8"?>
 <article xmlns:xlink="http://www.w3.org/1999/xlink" article-type="research-article" dtd-version="1.4" xml:lang="en">
     <front>
@@ -358,12 +451,28 @@ $rexult_JATS = '<?xml version="1.0" encoding="UTF-8"?>
                 </trans-title-group>
             </title-group>
             <contrib-group>' . $JATS_contrib . '
-            </contrib-group>
-
-
-
+            </contrib-group>' . $JATS_pub_date . '
+            <volume>' . $volume . '</volume>
+            <issue>' . $issue . '</issue>
+            <fpage>' . $startPage . '</fpage>
+            <lpage>' . $endPage . '</lpage>' . $JATS_history . '
+            <permissions>
+                <license>
+                    <license-p xml:lang="ru">CC BY 4.0</license-p>
+                </license>
+            </permissions>
+            <abstract xml:lang="ru">
+                <p>' . $abstract_ru . '</p>
+            </abstract>
+            <trans-abstract xml:lang="en">
+                <p>' . $abstract . '</p>
+            </trans-abstract>' . $JATS_kwd_ru . $JATS_kwd_en . '
         </article-meta>
     </front>
+    <back>
+        <ref-list>
+        </ref-list>
+    </back>
 </article>';
 
 /*---------------- End JATS ----------*/
@@ -603,11 +712,35 @@ function international_bases($user_uid){
 		$field_orcid = $user->field_orcid['und'][0]['value'];
 	}
 
-	return array(
-		'scopusid'     => $field_scopusid,
-		'researcherid' => $field_researcherid,
-		'orcid'        => $field_orcid,
-		'spin'         => $field_spin,
-	);
+	$lines = array();
+
+	if ($field_scopusid !== NULL && $field_scopusid !== '') {
+		$lines['scopusid'] = $field_scopusid;
+	}
+	if ($field_researcherid !== NULL && $field_researcherid !== '') {
+		$lines['researcherid'] = $field_researcherid;
+	}
+	if ($field_orcid !== NULL && $field_orcid !== '') {
+		$lines['orcid'] = $field_orcid;
+	}
+	if ($field_spin !== NULL && $field_spin !== '') {
+		$lines['spin'] = $field_spin;
+	}
+
+	return $lines;
+}
+
+function jats_parse_date($date_raw) {
+	$date_part = strtok(trim($date_raw), " T");
+	$parts = explode('-', $date_part);
+	if (count($parts) === 3) {
+		return array(
+			'iso'   => $date_part,
+			'year'  => $parts[0],
+			'month' => $parts[1],
+			'day'   => $parts[2],
+		);
+	}
+	return NULL;
 }
 
