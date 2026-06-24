@@ -429,6 +429,20 @@ if (!empty($node_xml->field_key_words['en'][0]['tid'])) {
             </kwd-group>';
 }
 
+// ref-list для JATS (список литературы)
+$JATS_refs = '';
+$refs = read_literature($node_xml);
+if (!empty($refs)) {
+	$i = 1;
+	foreach ($refs as $ref) {
+		$JATS_refs .= '
+            <ref id="ref' . $i . '">
+                <mixed-citation xml:lang="ru">' . $ref['text'] . '</mixed-citation>
+            </ref>';
+		$i++;
+	}
+}
+
 $rexult_JATS = '<?xml version="1.0" encoding="UTF-8"?>
 <article xmlns:xlink="http://www.w3.org/1999/xlink" article-type="research-article" dtd-version="1.4" xml:lang="en">
     <front>
@@ -461,16 +475,16 @@ $rexult_JATS = '<?xml version="1.0" encoding="UTF-8"?>
                     <license-p xml:lang="ru">CC BY 4.0</license-p>
                 </license>
             </permissions>
-            <abstract xml:lang="ru">
-                <p>' . $abstract_ru . '</p>
-            </abstract>
+            <abstract xml:lang="ru">'
+                . $abstract_ru . 
+			'</abstract>
             <trans-abstract xml:lang="en">
-                <p>' . $abstract . '</p>
+                ' . $abstract . '
             </trans-abstract>' . $JATS_kwd_ru . $JATS_kwd_en . '
         </article-meta>
     </front>
     <back>
-        <ref-list>
+        <ref-list>' . $JATS_refs . '
         </ref-list>
     </back>
 </article>';
@@ -559,7 +573,7 @@ $rexult_JATS = '<?xml version="1.0" encoding="UTF-8"?>
 
 				  <div class="tab-pane fade" id="nav-JATS" role="tabpanel" aria-labelledby="nav-JATS-tab">
 					<p class="text-right my-3">JATS</p>
-				    <textarea id="JATS">в разработке ' . $rexult_JATS . '</textarea>
+				    <textarea id="JATS">' . $rexult_JATS . '</textarea>
 				    <div class="text-right mt-3">
 				    	<button id="button_jats" onclick="downloadJATS();">save as JATS</button>
 				    </div>
@@ -742,5 +756,27 @@ function jats_parse_date($date_raw) {
 		);
 	}
 	return NULL;
+}
+
+function read_literature($node_xml) {
+	$items = field_get_items('node', $node_xml, 'field_literature');
+	if (empty($items[0]['value'])) {
+		return array();
+	}
+
+	$html = $items[0]['value'];
+	if (!preg_match_all('/<li\b[^>]*>(.*?)<\/li>/siu', $html, $matches)) {
+		return array();
+	}
+
+	$result = array();
+	foreach ($matches[1] as $li) {
+		$text = html_entity_decode($li, ENT_QUOTES | ENT_HTML5, 'UTF-8');
+		$text = strip_tags($text);
+		$text = trim($text);
+		$result[] = array('text' => $text);
+	}
+
+	return $result;
 }
 
