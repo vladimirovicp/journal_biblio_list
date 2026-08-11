@@ -450,14 +450,21 @@ $rexult_JATS = '<?xml version="1.0" encoding="UTF-8"?>
             <journal-title-group>
                 <journal-title xml:lang="ru">  '.$journalTitleRu.'  </journal-title>
             </journal-title-group>
-            <journal-id journal-id-type="issn"> '.$issnPrint.' </journal-id>
-            <journal-id journal-id-type="eissn"> '.$issnOnline.' </journal-id>
+			<issn publication-format="print">'.$issnPrint.'</issn>
+			<issn publication-format="electronic"> '.$issnOnline.' </issn>
         </journal-meta>
         <article-meta>
             <article-id pub-id-type="doi"> '.$doi.' </article-id>
             <article-id pub-id-type="edn"> '.$edn.' </article-id>
             <article-id pub-id-type="uri"> '.$absolute_url.' </article-id>
             <self-uri> '.$absolute_url.' </self-uri>
+
+			<article-categories>
+				<subj-group subj-group-type="article-type">
+					<subject>Научная статья</subject>
+				</subj-group>
+			</article-categories>
+
             <title-group>
                 <article-title xml:lang="ru">'.$TitlePageRu.'</article-title>
                 <trans-title-group xml:lang="en">
@@ -470,17 +477,30 @@ $rexult_JATS = '<?xml version="1.0" encoding="UTF-8"?>
             <issue>' . $issue . '</issue>
             <fpage>' . $startPage . '</fpage>
             <lpage>' . $endPage . '</lpage>' . $JATS_history . '
-            <permissions>
-                <license>
-                    <license-p xml:lang="ru">CC BY 4.0</license-p>
-                </license>
-            </permissions>
-            <abstract xml:lang="ru">'
-                . $abstract_ru . 
+
+			<permissions xml:lang="ru">
+				<copyright-statement>© Быстрова Т. Ю., Мазаев Г. В., 2026</copyright-statement>
+				<copyright-year>2026</copyright-year>
+				<copyright-holder>Быстрова Т. Ю., Мазаев Г. В.</copyright-holder>
+				<license license-type="open-access" xlink:href="https://creativecommons.org/licenses/by-nc/4.0/">
+					<license-p>
+						Это статья открытого доступа, распространяемая на условиях лицензии 
+						<ext-link ext-link-type="uri" xlink:href="https://creativecommons.org/licenses/by-nc/4.0/">
+						Creative Commons Attribution-NonCommercial 4.0 International (CC BY-NC 4.0)</ext-link>.
+					</license-p>
+				</license>
+			</permissions>
+
+            <abstract xml:lang="ru">' .
+				'<p>'
+                	. $abstract_ru .
+				'</p>' . 
 			'</abstract>
-            <trans-abstract xml:lang="en">
-                ' . $abstract . '
-            </trans-abstract>' . $JATS_kwd_ru . $JATS_kwd_en . '
+            <trans-abstract xml:lang="en">' .
+				'<p>'
+                	. $abstract . 
+				'</p>' .
+            '</trans-abstract>' . $JATS_kwd_ru . $JATS_kwd_en . '
         </article-meta>
     </front>
     <back>
