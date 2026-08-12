@@ -282,7 +282,9 @@ function mybiblio_list_block_content() {
 
 
 $JATS_copyright_statement = '';
+$JATS_copyright_statement_en = '';
 $JATS_copyright_holders = array();
+$JATS_copyright_holders_en = array();
 
 // Формирование contrib-group для JATS
 $JATS_contrib = '';
@@ -306,6 +308,21 @@ if (!empty($node_xml->field_autor['und'][0]['target_id'])) {
 			$JATS_copyright_holders[] = $name_ru['surname'] . ' ' . $copyright_initials;
 		} else {
 			$JATS_copyright_holders[] = $name_ru['surname'];
+		}
+
+		// Формление английской версии "Surname I. O." для copyright-statement и copyright-holder
+		$copyright_initials_en = '';
+		$given_name_parts_en = explode(' ', trim($name_en['given_names']));
+		foreach ($given_name_parts_en as $given_name_part_en) {
+			if ($given_name_part_en !== '') {
+				$copyright_initials_en .= mb_substr($given_name_part_en, 0, 1) . '. ';
+			}
+		}
+		$copyright_initials_en = trim($copyright_initials_en);
+		if ($copyright_initials_en !== '') {
+			$JATS_copyright_holders_en[] = $name_en['surname'] . ' ' . $copyright_initials_en;
+		} else {
+			$JATS_copyright_holders_en[] = $name_en['surname'];
 		}
 
 		$JATS_contrib .= '
@@ -381,6 +398,14 @@ if (!empty($JATS_copyright_holders) && $JATS_copyright_year !== '') {
 				<copyright-statement>© ' . $JATS_copyright_holder . ', ' . $JATS_copyright_year . '</copyright-statement>
 				<copyright-year>' . $JATS_copyright_year . '</copyright-year>
 				<copyright-holder>' . $JATS_copyright_holder . '</copyright-holder>';
+}
+
+if (!empty($JATS_copyright_holders_en) && $JATS_copyright_year !== '') {
+	$JATS_copyright_holder_en = implode(', ', $JATS_copyright_holders_en);
+	$JATS_copyright_statement_en = '
+				<copyright-statement>© ' . $JATS_copyright_holder_en . ', ' . $JATS_copyright_year . '</copyright-statement>
+				<copyright-year>' . $JATS_copyright_year . '</copyright-year>
+				<copyright-holder>' . $JATS_copyright_holder_en . '</copyright-holder>';
 }
 
 // Дата публикации для JATS (узел статьи)
@@ -513,9 +538,20 @@ $rexult_JATS = '<?xml version="1.0" encoding="UTF-8"?>
             <lpage>' . $endPage . '</lpage>' . $JATS_history . '
 
 			<permissions xml:lang="ru">' . $JATS_copyright_statement . '
-				<license license-type="open-access" xlink:href="https://creativecommons.org/licenses/by-nc/4.0/">
+				<license license-type="open-access" xlink:href="https://creativecommons.org/licenses/by/4.0/">
 					<license-p>
 						Это статья открытого доступа, распространяемая на условиях лицензии 
+						<ext-link ext-link-type="uri" xlink:href=" https://creativecommons.org/licenses/by/4.0/">
+							Creative Commons Attribution 4.0 International (CC BY 4.0)
+						</ext-link>.
+					</license-p>
+				</license>
+			</permissions>
+
+			<permissions xml:lang="en">' . $JATS_copyright_statement_en . '
+				<license license-type="open-access" xlink:href="https://creativecommons.org/licenses/by/4.0/">
+					<license-p>
+						This is an open access article distributed under the terms of the
 						<ext-link ext-link-type="uri" xlink:href=" https://creativecommons.org/licenses/by/4.0/">
 							Creative Commons Attribution 4.0 International (CC BY 4.0)
 						</ext-link>.
