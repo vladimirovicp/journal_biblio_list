@@ -280,6 +280,10 @@ function mybiblio_list_block_content() {
 
 /*------------------ JATS -------------*/
 
+
+$JATS_copyright_statement = '';
+$JATS_copyright_holders = array();
+
 // Формирование contrib-group для JATS
 $JATS_contrib = '';
 if (!empty($node_xml->field_autor['und'][0]['target_id'])) {
@@ -288,6 +292,21 @@ if (!empty($node_xml->field_autor['und'][0]['target_id'])) {
 		$name_ru = FIO_autor_node_split($user_uid, 'ru');
 		$name_en = FIO_autor_node_split($user_uid, 'en');
 		$bases = international_bases($user_uid);
+
+		// Формирование строки "Фамилия И. О." для copyright-statement и copyright-holder
+		$copyright_initials = '';
+		$given_name_parts = explode(' ', trim($name_ru['given_names']));
+		foreach ($given_name_parts as $given_name_part) {
+			if ($given_name_part !== '') {
+				$copyright_initials .= mb_substr($given_name_part, 0, 1) . '. ';
+			}
+		}
+		$copyright_initials = trim($copyright_initials);
+		if ($copyright_initials !== '') {
+			$JATS_copyright_holders[] = $name_ru['surname'] . ' ' . $copyright_initials;
+		} else {
+			$JATS_copyright_holders[] = $name_ru['surname'];
+		}
 
 		$JATS_contrib .= '
                 <contrib contrib-type="author">
@@ -345,6 +364,15 @@ if (!empty($node_xml->field_autor['und'][0]['target_id'])) {
                     </aff>
                 </aff-alternatives>';
 	}
+}
+
+// Формирование copyright-statement, copyright-year и copyright-holder для JATS
+if (!empty($JATS_copyright_holders) && !empty($Journal_year)) {
+	$JATS_copyright_holder = implode(', ', $JATS_copyright_holders);
+	$JATS_copyright_statement = '
+				<copyright-statement>© ' . $JATS_copyright_holder . ', ' . $Journal_year . '</copyright-statement>
+				<copyright-year>' . $Journal_year . '</copyright-year>
+				<copyright-holder>' . $JATS_copyright_holder . '</copyright-holder>';
 }
 
 // Дата публикации для JATS (узел статьи)
@@ -476,13 +504,7 @@ $rexult_JATS = '<?xml version="1.0" encoding="UTF-8"?>
             <fpage>' . $startPage . '</fpage>
             <lpage>' . $endPage . '</lpage>' . $JATS_history . '
 
-			<permissions xml:lang="ru">
-				<copyright-statement>© Быстрова Т. Ю., Мазаев Г. В., 2026</copyright-statement>
-				<copyright-year>2026</copyright-year>
-				<copyright-holder>Быстрова Т. Ю., Мазаев Г. В.</copyright-holder>
-
-
-
+			<permissions xml:lang="ru">' . $JATS_copyright_statement . '
 				<license license-type="open-access" xlink:href="https://creativecommons.org/licenses/by-nc/4.0/">
 					<license-p>
 						Это статья открытого доступа, распространяемая на условиях лицензии 
@@ -491,8 +513,6 @@ $rexult_JATS = '<?xml version="1.0" encoding="UTF-8"?>
 						</ext-link>.
 					</license-p>
 				</license>
-
-
 			</permissions>
 
             <abstract xml:lang="ru">' .
