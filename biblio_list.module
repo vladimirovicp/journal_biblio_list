@@ -367,11 +367,19 @@ if (!empty($node_xml->field_autor['und'][0]['target_id'])) {
 }
 
 // Формирование copyright-statement, copyright-year и copyright-holder для JATS
-if (!empty($JATS_copyright_holders) && !empty($Journal_year)) {
+$JATS_copyright_year = '';
+if (!empty($node_xml->field_date_received['und'][0]['value'])) {
+	$copyright_date = jats_parse_date($node_xml->field_date_received['und'][0]['value']);
+	if ($copyright_date) {
+		$JATS_copyright_year = $copyright_date['year'];
+	}
+}
+
+if (!empty($JATS_copyright_holders) && $JATS_copyright_year !== '') {
 	$JATS_copyright_holder = implode(', ', $JATS_copyright_holders);
 	$JATS_copyright_statement = '
-				<copyright-statement>© ' . $JATS_copyright_holder . ', ' . $Journal_year . '</copyright-statement>
-				<copyright-year>' . $Journal_year . '</copyright-year>
+				<copyright-statement>© ' . $JATS_copyright_holder . ', ' . $JATS_copyright_year . '</copyright-statement>
+				<copyright-year>' . $JATS_copyright_year . '</copyright-year>
 				<copyright-holder>' . $JATS_copyright_holder . '</copyright-holder>';
 }
 
