@@ -457,14 +457,12 @@ $rexult_JATS = '<?xml version="1.0" encoding="UTF-8"?>
             <article-id pub-id-type="doi"> '.$doi.' </article-id>
             <article-id pub-id-type="edn"> '.$edn.' </article-id>
             <article-id pub-id-type="uri"> '.$absolute_url.' </article-id>
-            <self-uri> '.$absolute_url.' </self-uri>
-
 			<article-categories>
 				<subj-group subj-group-type="article-type">
 					<subject>Научная статья</subject>
 				</subj-group>
 			</article-categories>
-
+			<self-uri> '.$absolute_url.' </self-uri>
             <title-group>
                 <article-title xml:lang="ru">'.$TitlePageRu.'</article-title>
                 <trans-title-group xml:lang="en">
@@ -482,13 +480,19 @@ $rexult_JATS = '<?xml version="1.0" encoding="UTF-8"?>
 				<copyright-statement>© Быстрова Т. Ю., Мазаев Г. В., 2026</copyright-statement>
 				<copyright-year>2026</copyright-year>
 				<copyright-holder>Быстрова Т. Ю., Мазаев Г. В.</copyright-holder>
+
+
+
 				<license license-type="open-access" xlink:href="https://creativecommons.org/licenses/by-nc/4.0/">
 					<license-p>
 						Это статья открытого доступа, распространяемая на условиях лицензии 
-						<ext-link ext-link-type="uri" xlink:href="https://creativecommons.org/licenses/by-nc/4.0/">
-						Creative Commons Attribution-NonCommercial 4.0 International (CC BY-NC 4.0)</ext-link>.
+						<ext-link ext-link-type="uri" xlink:href=" https://creativecommons.org/licenses/by/4.0/">
+							Creative Commons Attribution 4.0 International (CC BY 4.0)
+						</ext-link>.
 					</license-p>
 				</license>
+
+
 			</permissions>
 
             <abstract xml:lang="ru">' .
