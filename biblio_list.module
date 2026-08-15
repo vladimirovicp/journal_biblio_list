@@ -371,13 +371,50 @@ if (!empty($node_xml->field_autor['und'][0]['target_id'])) {
 		if (!empty($company_node->title_field['ru'][0]['value'])) {
 			$company_title_ru = $company_node->title_field['ru'][0]['value'];
 		}
+
+		$company_city_en = '';
+		$company_city_ru = '';
+		if (!empty($company_node->field_city_link['und'][0]['tid'])) {
+			$city_term = taxonomy_term_load($company_node->field_city_link['und'][0]['tid']);
+			if (!empty($city_term->name_field['en'][0]['value'])) {
+				$company_city_en = $city_term->name_field['en'][0]['value'];
+			} else {
+				$company_city_en = $city_term->name;
+			}
+			if (!empty($city_term->name_field['ru'][0]['value'])) {
+				$company_city_ru = $city_term->name_field['ru'][0]['value'];
+			} else {
+				$company_city_ru = $city_term->name;
+			}
+		}
+
+		$company_country_en = '';
+		$company_country_ru = '';
+		if (!empty($company_node->field_country['und'][0]['tid'])) {
+			$country_term = taxonomy_term_load($company_node->field_country['und'][0]['tid']);
+			if (!empty($country_term->name_field['en'][0]['value'])) {
+				$company_country_en = $country_term->name_field['en'][0]['value'];
+			} else {
+				$company_country_en = $country_term->name;
+			}
+			if (!empty($country_term->name_field['ru'][0]['value'])) {
+				$company_country_ru = $country_term->name_field['ru'][0]['value'];
+			} else {
+				$company_country_ru = $country_term->name;
+			}
+		}
+
 		$JATS_contrib .= '
                 <aff-alternatives id="aff' . ($i + 1) . '">
                     <aff>
                         <institution xml:lang="en">' . $company_title_en . '</institution>
+						<city xml:lang="en">' . $company_city_en .'</city>
+						<country xml:lang="en">' . $company_country_en . '</country>
                     </aff>
                     <aff>
                         <institution xml:lang="ru">' . $company_title_ru . '</institution>
+						<city xml:lang="ru">' . $company_city_ru . '</city>
+						<country xml:lang="ru">' . $company_country_ru . '</country>
                     </aff>
                 </aff-alternatives>';
 	}
