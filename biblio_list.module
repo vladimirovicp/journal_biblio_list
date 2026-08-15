@@ -566,12 +566,12 @@ $rexult_JATS = '<?xml version="1.0" encoding="UTF-8"?>
 				</license>
 			</permissions>
 			<self-uri> '.$absolute_url.' </self-uri>
-            <abstract xml:lang="ru">' .
+            <abstract abstract-type="main" xml:lang="ru">' .
 				'<p>'
                 	. $abstract_ru .
 				'</p>' . 
 			'</abstract>
-            <trans-abstract xml:lang="en">' .
+            <trans-abstract abstract-type="main" xml:lang="en">' .
 				'<p>'
                 	. $abstract . 
 				'</p>' .
