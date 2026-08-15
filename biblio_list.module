@@ -531,7 +531,6 @@ $rexult_JATS = '<?xml version="1.0" encoding="UTF-8"?>
 					<subject>' . $artType . '</subject>
 				</subj-group>
 			</article-categories>
-			<self-uri> '.$absolute_url.' </self-uri>
             <title-group>
                 <article-title xml:lang="ru">'.$TitlePageRu.'</article-title>
                 <trans-title-group xml:lang="en">
@@ -566,7 +565,7 @@ $rexult_JATS = '<?xml version="1.0" encoding="UTF-8"?>
 					</license-p>
 				</license>
 			</permissions>
-
+			<self-uri> '.$absolute_url.' </self-uri>
             <abstract xml:lang="ru">' .
 				'<p>'
                 	. $abstract_ru .
