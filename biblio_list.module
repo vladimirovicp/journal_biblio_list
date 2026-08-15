@@ -490,6 +490,14 @@ if (!empty($node_xml->field_key_words['en'][0]['tid'])) {
             </kwd-group>';
 }
 
+// Тип статьи для JATS (field_typersci)
+$artType = 'Научная статья';
+if (!empty($node_xml->field_typersci['und'][0]['tid'])) {
+	$artType_tid = $node_xml->field_typersci['und'][0]['tid'];
+	$artType_tid_node = taxonomy_term_load($artType_tid);
+	$artType = $artType_tid_node->name;
+}
+
 // ref-list для JATS (список литературы)
 $JATS_refs = '';
 $refs = read_literature($node_xml);
@@ -520,7 +528,7 @@ $rexult_JATS = '<?xml version="1.0" encoding="UTF-8"?>
             <article-id pub-id-type="uri"> '.$absolute_url.' </article-id>
 			<article-categories>
 				<subj-group subj-group-type="article-type">
-					<subject>Научная статья</subject>
+					<subject>' . $artType . '</subject>
 				</subj-group>
 			</article-categories>
 			<self-uri> '.$absolute_url.' </self-uri>
