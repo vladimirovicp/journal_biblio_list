@@ -376,10 +376,29 @@ if (!empty($node_xml->field_autor['und'][0]['target_id'])) {
 		$company_city_ru = '';
 		if (!empty($company_node->field_city_link['und'][0]['tid'])) {
 			$city_term = taxonomy_term_load($company_node->field_city_link['und'][0]['tid']);
+
+
+			
+
+			// $city_name_ru = i18n_string_translate($string_name, $city_term->name, array('langcode' => 'ru'));
+			// $city_name_en = i18n_string_translate($string_name, $city_term->name, array('langcode' => 'en'));
+
+			// dpm($city_term);
+
+			// dpm($city_name_ru);
+			//dpm($city_name_en);
+
+
 			if (!empty($city_term->name_field['en'][0]['value'])) {
 				$company_city_en = $city_term->name_field['en'][0]['value'];
 			} else {
-				$company_city_en = $city_term->name;
+
+				$string_name = 'taxonomy:term:' . $city_term->tid . ':name';
+				$city_name_en = i18n_string_translate($string_name, $city_term->name, array('langcode' => 'en'));
+
+				$company_city_en = $city_name_en;
+
+				// $company_city_en = $city_term->name;
 			}
 			if (!empty($city_term->name_field['ru'][0]['value'])) {
 				$company_city_ru = $city_term->name_field['ru'][0]['value'];
