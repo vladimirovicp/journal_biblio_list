@@ -600,16 +600,22 @@ $article_type_atribbute = isset($art_type_map[trim($artType)]) ? $art_type_map[t
 
 // ref-list для JATS (список литературы)
 $JATS_refs = '';
-$refs = read_literature($node_xml);
-if (!empty($refs)) {
-	$i = 1;
-	foreach ($refs as $ref) {
+$refs_ru = read_literature($node_xml, 'ru');
+$refs_en = read_literature($node_xml, 'en');
+$refs_count = max(count($refs_ru), count($refs_en));
+for ($i = 0; $i < $refs_count; $i++) {
+	$JATS_refs .= '
+            <ref id="ref' . ($i + 1) . '">';
+	if (isset($refs_ru[$i]['text'])) {
 		$JATS_refs .= '
-            <ref id="ref' . $i . '">
-                <mixed-citation xml:lang="ru">' . $ref['text'] . '</mixed-citation>
-            </ref>';
-		$i++;
+                <mixed-citation xml:lang="ru">' . $refs_ru[$i]['text'] . '</mixed-citation>';
 	}
+	if (isset($refs_en[$i]['text'])) {
+		$JATS_refs .= '
+                <mixed-citation xml:lang="en">' . $refs_en[$i]['text'] . '</mixed-citation>';
+	}
+	$JATS_refs .= '
+            </ref>';
 }
 
 $rexult_JATS = '<?xml version="1.0" encoding="UTF-8"?>
@@ -953,8 +959,9 @@ function jats_parse_date($date_raw) {
 	return NULL;
 }
 
-function read_literature($node_xml) {
-	$items = field_get_items('node', $node_xml, 'field_literature');
+function read_literature($node_xml, $lang) {
+	$lang = empty($node_xml->field_literature[$lang]) ? 'und' : $lang;
+	$items = $node_xml->field_literature[$lang];
 	if (empty($items[0]['value'])) {
 		return array();
 	}
