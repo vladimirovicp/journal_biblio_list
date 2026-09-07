@@ -181,9 +181,7 @@ function mybiblio_list_block_content() {
 	  }
 
 	  if (!empty($node_xml->body['en'][0]['value'])) {
-	  	$abstract_preobraz = strip_tags($node_xml->body['en'][0]['value']);
-	  	$abstract = '';
-		$abstract = mybiblio_list_shielding_special_characters(htmlspecialchars($abstract_preobraz));
+	  	$abstract = mybiblio_list_xml_safe($node_xml->body['en'][0]['value']);
 	  } else{ $abstract = '';}
 
 	if (!empty($node_xml->field_text_pdf['und'][0]['uri'])) {
@@ -543,8 +541,7 @@ if ($JATS_date_received != '' || $JATS_date_accepted != '') {
 // Аннотация на русском для JATS
 $abstract_ru = '';
 if (!empty($node_xml->body['ru'][0]['value'])) {
-	$abstract_ru_preobraz = strip_tags($node_xml->body['ru'][0]['value']);
-	$abstract_ru = mybiblio_list_shielding_special_characters(htmlspecialchars($abstract_ru_preobraz));
+	$abstract_ru = mybiblio_list_xml_safe($node_xml->body['ru'][0]['value']);
 }
 
 // Ключевые слова для JATS (оба языка)
@@ -608,11 +605,11 @@ for ($i = 0; $i < $refs_count; $i++) {
             <ref id="ref' . ($i + 1) . '">';
 	if (isset($refs_ru[$i]['text'])) {
 		$JATS_refs .= '
-                <mixed-citation xml:lang="ru">' . $refs_ru[$i]['text'] . '</mixed-citation>';
+                <mixed-citation xml:lang="ru">' . mybiblio_list_xml_safe($refs_ru[$i]['text']) . '</mixed-citation>';
 	}
 	if (isset($refs_en[$i]['text'])) {
 		$JATS_refs .= '
-                <mixed-citation xml:lang="en">' . $refs_en[$i]['text'] . '</mixed-citation>';
+                <mixed-citation xml:lang="en">' . mybiblio_list_xml_safe($refs_en[$i]['text']) . '</mixed-citation>';
 	}
 	$JATS_refs .= '
             </ref>';
@@ -774,7 +771,7 @@ $rexult_JATS = '<?xml version="1.0" encoding="UTF-8"?>
 
 				  <div class="tab-pane fade" id="nav-JATS" role="tabpanel" aria-labelledby="nav-JATS-tab">
 					<p class="text-right my-3">JATS</p>
-				    <textarea id="JATS">' . $rexult_JATS . '</textarea>
+				    <textarea id="JATS">' . str_replace('&', '&amp;', $rexult_JATS) . '</textarea>
 				    <div class="text-right mt-3">
 				    	<button id="button_jats" onclick="downloadJATS();">save as JATS</button>
 				    </div>
@@ -901,6 +898,18 @@ function  mybiblio_list_shielding_special_characters($text){
 		$text2 = str_replace($healthy, $yummy, $text2);	
 		$text_rezult = str_replace(array("\r\n", "\r", "\n"), ' ', $text2);
 		return $text_rezult;		
+}
+
+
+/**
+ * Подготовка текста для безопасной вставки в XML (JATS).
+ * Вырезает HTML-теги, нормализует уже существующие сущности
+ * и экранирует спецсимволы & < > " '.
+ */
+function mybiblio_list_xml_safe($text) {
+	$text = strip_tags($text);
+	$text = decode_entities($text);
+	return check_plain($text);
 }
 
 
