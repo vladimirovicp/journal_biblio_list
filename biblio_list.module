@@ -412,6 +412,7 @@ if (!empty($node_xml->field_autor['und'][0]['target_id'])) {
 
 		$company_country_en = '';
 		$company_country_ru = '';
+		
 		if (!empty($company_node->field_country['und'][0]['tid'])) {
 			$country_term = taxonomy_term_load($company_node->field_country['und'][0]['tid']);
 			if (!empty($country_term->name_field['en'][0]['value'])) {
@@ -429,6 +430,25 @@ if (!empty($node_xml->field_autor['und'][0]['target_id'])) {
 				$company_country_ru = $country_term->name_field['ru'][0]['value'];
 			} else {
 				$company_country_ru = $country_term->name;
+			}
+		} else {
+			
+			$country_term = '';
+			
+			if (!empty($company_node->field_country['ru'][0]['tid'])) {
+				$country_term = taxonomy_term_load($company_node->field_country['ru'][0]['tid']);
+			} else{
+				if (!empty($company_node->field_country['en'][0]['tid'])) {
+					$country_term = taxonomy_term_load($company_node->field_country['en'][0]['tid']);
+				}
+			}
+			
+			if($country_term){
+				$company_country_ru = $country_term->name;
+				
+				$string_name_country = 'taxonomy:term:' . $country_term->tid . ':name';
+				$country_name_en = i18n_string_translate($string_name_country,$country_term->name, array('langcode' => 'en'));
+				$company_country_en = $country_name_en;
 			}
 		}
 
@@ -996,4 +1016,3 @@ function read_literature($node_xml, $lang) {
 
 	return $result;
 }
-
