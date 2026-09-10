@@ -80,18 +80,29 @@ function mybiblio_list_block_content() {
 		} else {$publicationDate = '<publicationDate></publicationDate>';}
 
 
+
+
 		//Том
 		if(!empty($nodeview->field_volume['und'][0]['value'])){
-			$volume = $nodeview->field_volume['und'][0]['value'];		
+			$volume = $nodeview->field_volume['und'][0]['value'];
 		} else { $volume = '';}
 
 
 		//Выпуск
 		if(!empty($nodeview->field_number_str['und'][0]['value'])){
-			$issue = $nodeview->field_number_str['und'][0]['value'];
+			if(!empty($nodeview->field_through_number['und'][0]['value'])){
+				$issue = $nodeview->field_number_str['und'][0]['value'] . ' (' . $nodeview->field_through_number['und'][0]['value'] . ')';
+			} else {
+				$issue = $nodeview->field_number_str['und'][0]['value'];
+			}
 		} else {
 			if(!empty($nodeview->field_number['und'][0]['value'])){
-				$issue = $nodeview->field_number['und'][0]['value'];		
+				if(!empty($nodeview->field_through_number['und'][0]['value'])){
+					$issue = $nodeview->field_number['und'][0]['value'] . ' (' . $nodeview->field_through_number['und'][0]['value'] . ')';
+				} else {
+					$issue = $nodeview->field_number['und'][0]['value'];
+				}
+					
 			} else {$issue = '';}	
 		}
 
